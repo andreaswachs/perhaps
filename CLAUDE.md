@@ -2,6 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Recording changes for licensing purposes
+
+Since the end of July 2025 this codebase has been archived by the original
+authors and made freely available under the AGPLv3 license.
+
+Therefore we need to record high level changes to the codebase and record the
+date of which we commit.
+
+Please assist by recording a one-liner for each high level change in CHANGES.md
+in the root folder of the repository.
+
 ## Common Development Commands
 
 ### Development Server
@@ -66,9 +77,9 @@ Only proceed with pull request creation if ALL checks pass.
 ## High-Level Architecture
 
 ### Application Modes
-The Maybe app runs in two distinct modes:
-- **Managed**: The Maybe team operates and manages servers for users (Rails.application.config.app_mode = "managed")
-- **Self Hosted**: Users host the Maybe app on their own infrastructure, typically through Docker Compose (Rails.application.config.app_mode = "self_hosted")
+The Perhaps app runs in two distinct modes:
+- **Managed**: The Perhaps team operates and manages servers for users (Rails.application.config.app_mode = "managed")
+- **Self Hosted**: Users host the Perhaps app on their own infrastructure, typically through Docker Compose (Rails.application.config.app_mode = "self_hosted")
 
 ### Core Domain Model
 The application is built around financial data management with these key relationships:
@@ -108,7 +119,7 @@ Sidekiq handles asynchronous tasks:
 - **Stimulus Controllers**: Handle interactivity, organized alongside components
 - **Charts**: D3.js for financial visualizations (time series, donut, sankey)
 - **Styling**: Tailwind CSS v4.x with custom design system
-  - Design system defined in `app/assets/tailwind/maybe-design-system.css`
+  - Design system defined in `app/assets/tailwind/perhaps-design-system.css`
   - Always use functional tokens (e.g., `text-primary` not `text-white`)
   - Prefer semantic HTML elements over JS components
   - Use `icon` helper for icons, never `lucide_icon` directly
@@ -183,7 +194,7 @@ Sidekiq handles asynchronous tasks:
 ## TailwindCSS Design System
 
 ### Design System Rules
-- **Always reference `app/assets/tailwind/maybe-design-system.css`** for primitives and tokens
+- **Always reference `app/assets/tailwind/perhaps-design-system.css`** for primitives and tokens
 - **Use functional tokens** defined in design system:
   - `text-primary` instead of `text-white`
   - `bg-container` instead of `bg-white`

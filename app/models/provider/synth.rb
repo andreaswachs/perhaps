@@ -193,7 +193,7 @@ class Provider::Synth < Provider
     end
 
     def app_name
-      "maybe_app"
+      "perhaps_app"
     end
 
     def app_type

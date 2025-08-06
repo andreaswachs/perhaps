@@ -1,21 +1,21 @@
-# Contributing to Maybe
+# Contributing to Perhaps
 
-It means so much that you're interested in contributing to Maybe! Seriously. Thank you. The entire community benefits from these contributions!
+It means so much that you're interested in contributing to Perhaps! Seriously. Thank you. The entire community benefits from these contributions!
 
 ## House Rules
 
-- Before contributing, familiarize yourself with our project conventions. You should read through our [Project Conventions Rule](https://github.com/maybe-finance/maybe/.cursor/rules/project-conventions.mdc), which is intended for LLMs, but is also an excellent primer on how we write code for Maybe.
+- Before contributing, familiarize yourself with our project conventions. You should read through our [Project Conventions Rule](https://github.com/perhaps-finance/perhaps/.cursor/rules/project-conventions.mdc), which is intended for LLMs, but is also an excellent primer on how we write code for Perhaps.
 - While totally optional, consider using Cursor + VSCode as it will automatically apply our project conventions to your code via the `.cursor/rules` directory.
-- Before contributing, please check if it already exists in [issues](https://github.com/maybe-finance/maybe/issues) or [PRs](https://github.com/maybe-finance/maybe/pulls)
+- Before contributing, please check if it already exists in [issues](https://github.com/perhaps-finance/perhaps/issues) or [PRs](https://github.com/perhaps-finance/perhaps/pulls)
 - Given the speed at which we're moving on the codebase, we don't assign issues or "give" issues to anyone.
 - When multiple PRs are submitted for the same issue, we take the one that most succinctly & efficiently solves a given problem and stays within the scope of work.
 - Priority is generally given to previous committers as they've proven familiarity with the codebase and product.
 
 ## What should I contribute?
 
-As we are still in the early days of this project, we recommend [heading over to the Wiki](https://github.com/maybe-finance/maybe/wiki) to get a better idea of _what_ to contribute.
+As we are still in the early days of this project, we recommend [heading over to the Wiki](https://github.com/perhaps-finance/perhaps/wiki) to get a better idea of _what_ to contribute.
 
-In general, _full features_ that get us closer to [our Vision](https://github.com/maybe-finance/maybe/wiki/Vision) are the most valuable contributions at this stage.
+In general, _full features_ that get us closer to [our Vision](https://github.com/perhaps-finance/perhaps/wiki/Vision) are the most valuable contributions at this stage.
 
 ## Development
 
@@ -25,9 +25,9 @@ To get setup for local development, you have two options:
 
 1. [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers) with VSCode (see the `.devcontainer` folder)
 2. Local Development
-   - [Mac Setup Guide](https://github.com/maybe-finance/maybe/wiki/Mac-Dev-Setup-Guide)
-   - [Linux Setup Guide](https://github.com/maybe-finance/maybe/wiki/Linux-Dev-Setup-Guide)
-   - [Windows Setup Guide](https://github.com/maybe-finance/maybe/wiki/Windows-Dev-Setup-Guide)
+   - [Mac Setup Guide](https://github.com/perhaps-finance/perhaps/wiki/Mac-Dev-Setup-Guide)
+   - [Linux Setup Guide](https://github.com/perhaps-finance/perhaps/wiki/Linux-Dev-Setup-Guide)
+   - [Windows Setup Guide](https://github.com/perhaps-finance/perhaps/wiki/Windows-Dev-Setup-Guide)
 
 ### Making a Pull Request
 
