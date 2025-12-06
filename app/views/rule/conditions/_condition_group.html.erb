@@ -34,7 +34,7 @@
   </template>
 
   <ul data-rule--conditions-target="subConditionsList" class="space-y-3">
-    <%= form.fields_for :sub_conditions, condition.sub_conditions.select(&:persisted?) do |scf| %>
+    <%= form.fields_for :sub_conditions do |scf| %>
       <%= render "rule/conditions/condition", form: scf, show_prefix: false %>
     <% end %>
   </ul>

@@ -1,5 +1,16 @@
 require "sidekiq/web"
 
+# Configure Redis URL for Sidekiq (supports both local dev and Docker environments)
+redis_url = ENV.fetch("REDIS_URL", "redis://localhost:6379/1")
+
+Sidekiq.configure_server do |config|
+  config.redis = { url: redis_url }
+end
+
+Sidekiq.configure_client do |config|
+  config.redis = { url: redis_url }
+end
+
 if Rails.env.production?
   Sidekiq::Web.use(Rack::Auth::Basic) do |username, password|
     configured_username = ::Digest::SHA256.hexdigest(ENV.fetch("SIDEKIQ_WEB_USERNAME", "perhaps"))

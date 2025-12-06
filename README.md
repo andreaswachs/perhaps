@@ -3,19 +3,18 @@
 
 # Perhaps: The personal finance app for everyone
 
-> [!IMPORTANT]
-> This repository is no longer actively maintained. You can read more about this in our [final release](https://github.com/perhaps-finance/perhaps/releases/tag/v0.6.0).
+## Attribution & Origin
+
+This project is a fork of the original [Maybe Finance](https://github.com/maybe-finance/maybe) personal finance application, which was released as open source under the AGPLv3 license in July 2025.
+
+**Important notices:**
+- This project is **not affiliated with or endorsed by** Maybe Finance Inc.
+- "Maybe" is a trademark of Maybe Finance Inc. - this fork uses the name "Perhaps" to avoid trademark issues
+- The original Maybe Finance repository is no longer maintained by its original authors
 
 ## Perhaps Hosting
 
 Perhaps is a fully working personal finance app that can be [self hosted with Docker](docs/hosting/docker.md).
-
-## Forking and Attribution
-
-This repo is no longer maintained. You’re free to fork it under the AGPLv3. To stay compliant and avoid trademark issues:
-
-- Be sure to include the original [AGPLv3 license](https://github.com/perhaps-finance/perhaps/blob/main/LICENSE) and clearly state in your README that your fork is based on Perhaps Finance but is **not affiliated with or endorsed by** Perhaps Finance Inc.
-- "Perhaps" is a trademark of Perhaps Finance Inc. and therefore, use of it is NOT allowed in forked repositories (or the logo)
 
 ## Local Development Setup
 
@@ -56,8 +55,11 @@ For further instructions, see guides below.
 - [Windows dev setup guide](https://github.com/perhaps-finance/perhaps/wiki/Windows-Dev-Setup-Guide)
 - Dev containers - visit [this guide](https://code.visualstudio.com/docs/devcontainers/containers) to learn more
 
-## Copyright & license
+## Copyright & License
 
-Perhaps is distributed under
-an [AGPLv3 license](https://github.com/perhaps-finance/perhaps/blob/main/LICENSE). "
-Perhaps" is a trademark of Perhaps Finance, Inc.
+This project is distributed under the [AGPLv3 license](LICENSE).
+
+**Original work**: Copyright (C) Maybe Finance Inc.
+**Modifications**: Copyright (C) 2025 Perhaps contributors (see [CHANGES.md](CHANGES.md))
+
+In compliance with AGPLv3 Section 5, all modifications are documented in [CHANGES.md](CHANGES.md) with dates.

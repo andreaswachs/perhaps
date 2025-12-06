@@ -41,12 +41,18 @@ x-rails-env: &rails_env
   DB_HOST: db
   DB_PORT: 5432
   REDIS_URL: redis://redis:6379/1
-# NOTE: enabling OpenAI will incur costs when you use AI-related features in the app (chat, rules).  Make sure you have set appropriate spend limits on your account before adding this.
-  OPENAI_ACCESS_TOKEN: ${OPENAI_ACCESS_TOKEN}
+# NOTE: enabling Anthropic Claude will incur costs when you use AI-related features in the app (chat, rules). Make sure you have set appropriate spend limits on your account before adding this.
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
 
 services:
   web:
-    image: ghcr.io/perhaps-finance/perhaps:latest
+    # To use pre-built image from GitHub Container Registry, uncomment the line below:
+    # image: ghcr.io/perhaps-finance/perhaps:latest
+    # To build from local source, use the build configuration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: perhaps:local
     volumes:
       - app-storage:/rails/storage
     ports:
@@ -63,7 +69,13 @@ services:
       - perhaps_net
 
   worker:
-    image: ghcr.io/perhaps-finance/perhaps:latest
+    # To use pre-built image from GitHub Container Registry, uncomment the line below:
+    # image: ghcr.io/perhaps-finance/perhaps:latest
+    # To build from local source, use the build configuration:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: perhaps:local
     command: bundle exec sidekiq
     restart: unless-stopped
     depends_on:

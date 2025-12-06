@@ -1,0 +1,56 @@
+<%= turbo_frame_tag "modal" do %>
+<%= render "accounts/new/container", title: "Reconnect Bank", back_path: accounts_path do %>
+  <div class="space-y-6">
+    <div class="flex flex-col items-center gap-4">
+      <div class="flex items-center justify-center h-16 w-16 bg-warning/10 rounded-full">
+        <% if @gocardless_item.logo.attached? %>
+          <%= image_tag @gocardless_item.logo, class: "rounded-full h-12 w-12", loading: "lazy" %>
+        <% elsif @gocardless_item.institution_logo_url.present? %>
+          <%= image_tag @gocardless_item.institution_logo_url, class: "rounded-full h-12 w-12", loading: "lazy" %>
+        <% else %>
+          <span class="text-warning text-xl font-medium"><%= @gocardless_item.name&.first&.upcase || "G" %></span>
+        <% end %>
+      </div>
+
+      <div class="text-center">
+        <h2 class="text-lg font-medium text-primary"><%= @gocardless_item.name %></h2>
+        <p class="text-sm text-secondary mt-1">
+          <% if @gocardless_item.expired? %>
+            Your bank connection has expired and needs to be re-authenticated.
+          <% elsif @gocardless_item.suspended? %>
+            Your bank connection was suspended and needs to be re-authenticated.
+          <% elsif @gocardless_item.access_expiring_soon? %>
+            Your bank connection will expire soon. Re-authenticate to continue syncing.
+          <% else %>
+            Re-authenticate your bank connection to continue syncing.
+          <% end %>
+        </p>
+      </div>
+    </div>
+
+    <div class="bg-surface border border-secondary rounded-lg p-4">
+      <div class="flex items-start gap-3">
+        <%= icon "info", size: "sm", class: "text-secondary mt-0.5" %>
+        <div class="text-sm text-secondary">
+          <p>You'll be redirected to GoCardless to securely re-authenticate with your bank.</p>
+          <p class="mt-2">Your existing accounts and transaction history will be preserved.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <%= form_with url: reconnect_gocardless_item_path(@gocardless_item), method: :post, data: { turbo: false } do %>
+        <%= render DS::Button.new(text: "Reconnect Bank", variant: "primary", full_width: true, icon: "refresh-cw") %>
+      <% end %>
+
+      <%= render DS::Link.new(
+        text: "Cancel",
+        href: accounts_path,
+        variant: "ghost",
+        full_width: true,
+        frame: "_top"
+      ) %>
+    </div>
+  </div>
+<% end %>
+<% end %>

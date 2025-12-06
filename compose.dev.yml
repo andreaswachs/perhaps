@@ -1,0 +1,142 @@
+# ===========================================================================
+# Development Docker Compose file
+# ===========================================================================
+#
+# Purpose:
+# --------
+# This file provides two modes of development:
+#
+# Mode 1 - Dependencies only (default):
+#   Run only PostgreSQL and Redis, with Rails running natively on your machine.
+#   Usage: docker compose -f compose.dev.yml up -d
+#   Then:  bin/dev
+#
+# Mode 2 - Full containerized development with hot reloading:
+#   Run the entire stack in Docker with source code mounted for hot reloading.
+#   Usage: docker compose -f compose.dev.yml --profile full up
+#
+# Commands:
+# ---------
+# Start dependencies only:  docker compose -f compose.dev.yml up -d
+# Start full stack:         docker compose -f compose.dev.yml --profile full up
+# Stop services:            docker compose -f compose.dev.yml down
+# View logs:                docker compose -f compose.dev.yml logs -f
+# Rebuild after Gemfile:    docker compose -f compose.dev.yml --profile full up --build
+#
+# Hot Reloading:
+# --------------
+# When using the full profile, any changes to Ruby files, ERB templates,
+# JavaScript, or CSS will automatically reload in the browser thanks to
+# hotwire-livereload. Just save your file and see changes instantly!
+#
+
+x-db-env: &db_env
+  POSTGRES_USER: ${POSTGRES_USER:-postgres}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+  POSTGRES_DB: ${POSTGRES_DB:-perhaps_development}
+
+x-rails-dev-env: &rails_dev_env
+  <<: *db_env
+  RAILS_ENV: development
+  DB_HOST: db
+  DB_PORT: 5432
+  REDIS_URL: redis://redis:6379/1
+  SECRET_KEY_BASE: dev_secret_key_base_for_local_development_only
+  BINDING: 0.0.0.0
+  GOCARDLESS_SECRET_ID: "${GOCARDLESS_SECRET_ID}"
+  GOCARDLESS_SECRET_KEY: "${GOCARDLESS_SECRET_KEY}"
+  ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
+  PERHAPS_AI_ENABLED: "true"
+  SELF_HOSTED: "true"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-perhaps_development}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-dev-data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Full containerized development with hot reloading
+  web:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      # Mount source code for hot reloading
+      - .:/rails:cached
+      # Mask .env file to prevent conflicts with Docker environment variables
+      - /dev/null:/rails/.env:ro
+      # Use named volumes for dependencies to avoid overwriting
+      - bundle-dev:/usr/local/bundle
+      - node-modules-dev:/rails/node_modules
+      # Persist tmp and storage
+      - tmp-dev:/rails/tmp
+      - storage-dev:/rails/storage
+    ports:
+      - "3000:3000"
+      - "3035:3035"  # Webpack dev server if needed
+    environment:
+      <<: *rails_dev_env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    stdin_open: true
+    tty: true
+
+  # Sidekiq worker for background jobs
+  worker:
+    profiles: ["full"]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bash -c "bundle install && bundle exec sidekiq -C config/sidekiq.yml"
+    volumes:
+      - .:/rails:cached
+      # Mask .env file to prevent conflicts with Docker environment variables
+      - /dev/null:/rails/.env:ro
+      - bundle-dev:/usr/local/bundle
+      - node-modules-dev:/rails/node_modules
+      - tmp-dev:/rails/tmp
+      - storage-dev:/rails/storage
+    environment:
+      <<: *rails_dev_env
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres-dev-data:
+  redis-dev-data:
+  bundle-dev:
+  node-modules-dev:
+  tmp-dev:
+  storage-dev:

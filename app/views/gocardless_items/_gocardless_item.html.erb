@@ -1,0 +1,100 @@
+<%# locals: (gocardless_item:) %>
+
+<%= tag.div id: dom_id(gocardless_item) do %>
+  <details open class="group bg-container p-4 shadow-border-xs rounded-xl">
+    <summary class="flex items-center justify-between gap-2 focus-visible:outline-hidden">
+      <div class="flex items-center gap-2">
+        <%= icon "chevron-right", class: "group-open:transform group-open:rotate-90" %>
+
+        <div class="flex items-center justify-center h-8 w-8 bg-green-600/10 rounded-full">
+          <% if gocardless_item.logo.attached? %>
+            <%= image_tag gocardless_item.logo, class: "rounded-full h-full w-full", loading: "lazy" %>
+          <% elsif gocardless_item.institution_logo_url.present? %>
+            <%= image_tag gocardless_item.institution_logo_url, class: "rounded-full h-full w-full", loading: "lazy" %>
+          <% else %>
+            <div class="flex items-center justify-center">
+              <%= tag.p gocardless_item.name&.first&.upcase || "G", class: "text-green-600 text-xs font-medium" %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="pl-1 text-sm">
+          <div class="flex items-center gap-2">
+            <%= tag.p gocardless_item.name, class: "font-medium text-primary" %>
+            <% if gocardless_item.scheduled_for_deletion? %>
+              <p class="text-destructive text-sm animate-pulse">(deletion in progress...)</p>
+            <% end %>
+          </div>
+          <% if gocardless_item.syncing? %>
+            <div class="text-secondary flex items-center gap-1">
+              <%= icon "loader", size: "sm", class: "animate-pulse" %>
+              <span>Syncing...</span>
+            </div>
+          <% elsif gocardless_item.expired? || gocardless_item.suspended? %>
+            <div class="text-warning flex items-center gap-1">
+              <%= icon "alert-triangle", size: "sm", color: "warning" %>
+              <span>Requires re-authentication</span>
+            </div>
+          <% elsif gocardless_item.access_expiring_soon? %>
+            <div class="text-warning flex items-center gap-1">
+              <%= icon "clock", size: "sm", color: "warning" %>
+              <span>Access expires in <%= distance_of_time_in_words(Time.current, gocardless_item.access_valid_until) %></span>
+            </div>
+          <% elsif gocardless_item.sync_error.present? %>
+            <div class="text-secondary flex items-center gap-1">
+              <%= icon "alert-circle", size: "sm", color: "destructive" %>
+              <span class="text-destructive">Error syncing</span>
+            </div>
+          <% else %>
+            <p class="text-secondary">
+              <%= gocardless_item.last_synced_at ? "Synced #{time_ago_in_words(gocardless_item.last_synced_at)} ago" : "Never synced" %>
+            </p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <% if gocardless_item.expired? || gocardless_item.suspended? || gocardless_item.access_expiring_soon? %>
+          <%= render DS::Link.new(
+            text: "Reconnect",
+            icon: "refresh-cw",
+            variant: "secondary",
+            href: edit_gocardless_item_path(gocardless_item),
+            frame: "modal"
+          ) %>
+        <% elsif Rails.env.development? || Rails.application.config.app_mode == "self_hosted" %>
+          <%= icon(
+            "refresh-cw",
+            as_button: true,
+            href: sync_gocardless_item_path(gocardless_item),
+            method: :post
+          ) %>
+        <% end %>
+
+        <%= render DS::Menu.new do |menu| %>
+          <% menu.with_item(
+            variant: "button",
+            text: "Delete",
+            icon: "trash-2",
+            href: gocardless_item_path(gocardless_item),
+            method: :delete,
+            confirm: CustomConfirm.for_resource_deletion(gocardless_item.name, high_severity: true)
+          ) %>
+        <% end %>
+      </div>
+    </summary>
+
+    <% unless gocardless_item.scheduled_for_deletion? %>
+      <div class="space-y-4 mt-4">
+        <% if gocardless_item.accounts.any? %>
+          <%= render "accounts/index/account_groups", accounts: gocardless_item.accounts %>
+        <% else %>
+          <div class="p-4 flex flex-col gap-3 items-center justify-center">
+            <p class="text-primary font-medium text-sm">No accounts synced yet</p>
+            <p class="text-secondary text-sm">Accounts will appear here once syncing completes.</p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </details>
+<% end %>

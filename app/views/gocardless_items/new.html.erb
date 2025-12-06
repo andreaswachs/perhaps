@@ -1,0 +1,30 @@
+<%= turbo_frame_tag "modal" do %>
+  <%= render "accounts/new/container", title: "Connect European Bank" do %>
+    <div class="space-y-4">
+      <div class="text-center">
+        <p class="text-sm text-secondary">Select your country to see available banks</p>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <% @countries.each do |country_code| %>
+          <%= link_to select_country_gocardless_items_path(country: country_code),
+                      class: "flex items-center gap-2 p-3 border rounded-lg hover:bg-surface transition-colors #{@selected_country == country_code ? 'border-primary bg-surface' : 'border-secondary'}",
+                      data: { turbo_frame: "modal" } do %>
+            <span class="text-xl"><%= country_flag_emoji(country_code) %></span>
+            <span class="text-sm font-medium text-primary"><%= country_code %></span>
+          <% end %>
+        <% end %>
+      </div>
+
+      <% if @selected_country %>
+        <div class="pt-4">
+          <%= link_to select_country_gocardless_items_path(country: @selected_country),
+                      class: "w-full",
+                      data: { turbo_frame: "modal" } do %>
+            <%= render DS::Button.new(text: "Continue with #{@selected_country}", variant: "primary", full_width: true) %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

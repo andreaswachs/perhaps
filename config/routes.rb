@@ -251,6 +251,17 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :gocardless_items, only: %i[new create destroy edit] do
+    collection do
+      get :select_country
+      get :callback
+    end
+    member do
+      post :sync
+      post :reconnect
+    end
+  end
+
   namespace :webhooks do
     post "plaid"
     post "plaid_eu"

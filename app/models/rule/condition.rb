@@ -7,6 +7,7 @@ class Rule::Condition < ApplicationRecord
   validates :condition_type, presence: true
   validates :operator, presence: true
   validates :value, presence: true, unless: -> { compound? }
+  validate :compound_must_have_sub_conditions, if: -> { compound? }
 
   accepts_nested_attributes_for :sub_conditions, allow_destroy: true
 
@@ -60,6 +61,12 @@ class Rule::Condition < ApplicationRecord
   end
 
   private
+    def compound_must_have_sub_conditions
+      if sub_conditions.reject(&:marked_for_destruction?).empty?
+        errors.add(:base, "Compound condition must have at least one sub-condition")
+      end
+    end
+
     def build_compound_scope(scope)
       if operator == "or"
         combined_scope = sub_conditions

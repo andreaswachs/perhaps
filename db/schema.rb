@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_30_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -35,6 +35,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.decimal "cash_balance", precision: 19, scale: 4, default: "0.0"
     t.jsonb "locked_attributes", default: {}
     t.string "status", default: "active"
+    t.uuid "gocardless_account_id"
     t.index ["accountable_id", "accountable_type"], name: "index_accounts_on_accountable_id_and_accountable_type"
     t.index ["accountable_type"], name: "index_accounts_on_accountable_type"
     t.index ["currency"], name: "index_accounts_on_currency"
@@ -42,6 +43,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.index ["family_id", "id"], name: "index_accounts_on_family_id_and_id"
     t.index ["family_id", "status"], name: "index_accounts_on_family_id_and_status"
     t.index ["family_id"], name: "index_accounts_on_family_id"
+    t.index ["gocardless_account_id"], name: "index_accounts_on_gocardless_account_id"
     t.index ["import_id"], name: "index_accounts_on_import_id"
     t.index ["plaid_account_id"], name: "index_accounts_on_plaid_account_id"
     t.index ["status"], name: "index_accounts_on_status"
@@ -276,6 +278,44 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["family_id"], name: "index_family_exports_on_family_id"
+  end
+
+  create_table "gocardless_accounts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "gocardless_item_id", null: false
+    t.string "gocardless_id", null: false
+    t.string "iban"
+    t.string "name", null: false
+    t.string "owner_name"
+    t.string "currency", null: false
+    t.string "account_type"
+    t.decimal "current_balance", precision: 19, scale: 4
+    t.decimal "available_balance", precision: 19, scale: 4
+    t.jsonb "raw_payload", default: {}
+    t.jsonb "raw_balances_payload", default: {}
+    t.jsonb "raw_transactions_payload", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["gocardless_id"], name: "index_gocardless_accounts_on_gocardless_id", unique: true
+    t.index ["gocardless_item_id"], name: "index_gocardless_accounts_on_gocardless_item_id"
+  end
+
+  create_table "gocardless_items", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "family_id", null: false
+    t.string "requisition_id", null: false
+    t.string "institution_id", null: false
+    t.string "name"
+    t.string "status", default: "pending", null: false
+    t.datetime "access_valid_until"
+    t.string "institution_logo_url"
+    t.string "institution_country"
+    t.boolean "scheduled_for_deletion", default: false, null: false
+    t.jsonb "raw_payload", default: {}
+    t.jsonb "raw_institution_payload", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["family_id", "status"], name: "index_gocardless_items_on_family_id_and_status"
+    t.index ["family_id"], name: "index_gocardless_items_on_family_id"
+    t.index ["requisition_id"], name: "index_gocardless_items_on_requisition_id", unique: true
   end
 
   create_table "holdings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -825,6 +865,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
   end
 
   add_foreign_key "accounts", "families"
+  add_foreign_key "accounts", "gocardless_accounts"
   add_foreign_key "accounts", "imports"
   add_foreign_key "accounts", "plaid_accounts"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
@@ -839,6 +880,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_07_24_115507) do
   add_foreign_key "entries", "accounts"
   add_foreign_key "entries", "imports"
   add_foreign_key "family_exports", "families"
+  add_foreign_key "gocardless_accounts", "gocardless_items"
+  add_foreign_key "gocardless_items", "families"
   add_foreign_key "holdings", "accounts"
   add_foreign_key "holdings", "securities"
   add_foreign_key "impersonation_session_logs", "impersonation_sessions"

@@ -13,12 +13,32 @@ date of which we commit.
 Please assist by recording a one-liner for each high level change in CHANGES.md
 in the root folder of the repository.
 
+## Keeping CLAUDE.md up to date
+
+**IMPORTANT:** When implementing significant new features or architectural changes, update this CLAUDE.md file to document them. This ensures future development sessions have accurate context about the codebase.
+
+Examples of changes that should be documented here:
+- New integrations or providers (e.g., GoCardless, Anthropic)
+- New major models or domain concepts
+- Changes to the development workflow or tooling
+- Architectural decisions or pattern changes
+
 ## Common Development Commands
 
 ### Development Server
-- `bin/dev` - Start development server (Rails, Sidekiq, Tailwind CSS watcher)
-- `bin/rails server` - Start Rails server only
+- `bin/dev` - Start development server (Rails, Sidekiq, Tailwind CSS watcher) with **automatic browser reload**
+  - This uses `hotwire-livereload` gem which automatically reloads your browser when files change
+  - No manual refresh needed - just save your file and see changes instantly
+  - Watches Ruby files, ERB templates, JavaScript, CSS, and more
+- `bin/rails server` - Start Rails server only (without livereload or background jobs)
 - `bin/rails console` - Open Rails console
+
+**Rapid Development Workflow:**
+1. Run `bin/dev` in your terminal
+2. Open `http://localhost:3000` in your browser
+3. Make changes to any file (controllers, views, models, CSS, JS)
+4. Save the file - browser automatically reloads with your changes
+5. No manual refresh needed!
 
 ### Testing
 - `bin/rails test` - Run all tests
@@ -42,6 +62,69 @@ in the root folder of the repository.
 
 ### Setup
 - `bin/setup` - Initial project setup (installs dependencies, prepares database)
+
+### Docker Development Dependencies
+
+**Prerequisites:**
+- Docker and Docker Compose installed
+- PostgreSQL and Redis run in Docker containers for isolation and consistency
+
+**Start dependencies:**
+```bash
+docker compose -f compose.dev.yml up -d
+```
+
+**Stop dependencies:**
+```bash
+docker compose -f compose.dev.yml down
+```
+
+**View logs:**
+```bash
+docker compose -f compose.dev.yml logs -f
+```
+
+**What runs in Docker:**
+- PostgreSQL 16 on port 5432
+- Redis (uses existing instance on port 6379, database 2)
+
+**What runs natively:**
+- Rails server (via `bin/dev`)
+- Sidekiq workers
+- Tailwind CSS watcher
+
+**First-time setup:**
+1. Start Docker dependencies: `docker compose -f compose.dev.yml up -d`
+2. Prepare database: `bin/rails db:prepare`
+3. Start development server: `bin/dev`
+4. Access app at http://localhost:3000
+
+### Makefile Commands (Alternative Docker Workflow)
+
+A Makefile provides convenient shortcuts for Docker-based development:
+
+**Development:**
+- `make dev` - Start full containerized stack with hot reloading
+- `make deps` - Start only PostgreSQL and Redis (run Rails natively)
+- `make down` - Stop all services
+- `make logs` - View container logs (follow mode)
+- `make rebuild` - Rebuild containers (after Gemfile changes)
+
+**Container Access:**
+- `make console` - Open Rails console in web container
+- `make shell` - Open bash shell in web container
+
+**Database:**
+- `make db-migrate` - Run database migrations
+- `make db-reset` - Reset database (drop, create, migrate, seed)
+
+**Testing & Linting (in container):**
+- `make test` - Run all tests
+- `make lint` - Run rubocop and erb_lint
+- `make security` - Run brakeman security scan
+
+**Cleanup:**
+- `make clean` - Stop containers and remove volumes
 
 ## Pre-Pull Request CI Workflow
 
@@ -96,12 +179,18 @@ The application provides both internal and external APIs:
 - Rate limiting via Rack Attack with configurable limits per API key
 
 ### Sync & Import System
-Two primary data ingestion methods:
-1. **Plaid Integration**: Real-time bank account syncing
+Three primary data ingestion methods:
+1. **Plaid Integration** (US/Canada): Real-time bank account syncing
    - `PlaidItem` manages connections
    - `Sync` tracks sync operations
    - Background jobs handle data updates
-2. **CSV Import**: Manual data import with mapping
+2. **GoCardless Integration** (Europe): European bank account syncing via Open Banking
+   - `GocardlessItem` manages bank connections (requisitions)
+   - `GocardlessAccount` links to bank accounts
+   - Supports 2,500+ European banks
+   - 90-day transaction history limit
+   - Requires `GOCARDLESS_SECRET_ID` and `GOCARDLESS_SECRET_KEY` env vars
+3. **CSV Import**: Manual data import with mapping
    - `Import` manages import sessions
    - Supports transaction and balance imports
    - Custom field mapping with transformation rules
@@ -112,6 +201,19 @@ Sidekiq handles asynchronous tasks:
 - Import processing (`ImportDataJob`)
 - AI chat responses (`CreateChatResponseJob`)
 - Scheduled maintenance via sidekiq-cron
+
+### AI Provider (Anthropic Claude)
+The app uses Anthropic Claude for all AI-powered features:
+- **Provider**: `Provider::Anthropic` (replaced OpenAI)
+- **Models available**:
+  - `claude-haiku-4-5-20250929` ("Fast" mode) - Quick responses, lower cost
+  - `claude-sonnet-4-5-20250929` ("Intelligent" mode) - Best quality, complex reasoning
+- **Features powered by AI**:
+  - Chat assistant for financial questions
+  - Auto-categorization of transactions
+  - Auto-detection of merchants
+- **Configuration**: Requires `ANTHROPIC_API_KEY` env var (or `Setting.anthropic_api_key`)
+- **Model selection**: Users can toggle between Fast/Intelligent modes in the chat interface
 
 ### Frontend Architecture
 - **Hotwire Stack**: Turbo + Stimulus for reactive UI without heavy JavaScript

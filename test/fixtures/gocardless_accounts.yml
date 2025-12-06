@@ -1,0 +1,11 @@
+one:
+  gocardless_item: one
+  gocardless_id: "gc_acc_12345"
+  iban: "GB33BUKB20201555555555"
+  name: "Main Checking"
+  currency: "EUR"
+  balance: 1500.50
+  balance_date: <%= Date.current %>
+  account_type: "CACC"
+  raw_payload: {}
+  raw_transactions_payload: []

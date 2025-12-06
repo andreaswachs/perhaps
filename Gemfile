@@ -17,7 +17,7 @@ gem "bootsnap", require: false
 gem "importmap-rails"
 gem "propshaft"
 gem "tailwindcss-rails"
-gem "lucide-rails", github: "perhaps-finance/lucide-rails"
+gem "lucide-rails", github: "andreaswachs/lucide-rails"
 
 # Hotwire + UI
 gem "stimulus-rails"
@@ -79,7 +79,7 @@ gem "aasm"
 gem "after_commit_everywhere", "~> 1.0"
 
 # AI
-gem "ruby-openai"
+gem "anthropic"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows]

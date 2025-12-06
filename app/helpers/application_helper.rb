@@ -49,6 +49,13 @@ module ApplicationHelper
     current_page?(path) || (request.path.start_with?(path) && path != "/")
   end
 
+  # Convert ISO country code to flag emoji
+  def country_flag_emoji(country_code)
+    return "" if country_code.blank?
+
+    country_code.upcase.chars.map { |char| (char.ord + 127397).chr(Encoding::UTF_8) }.join
+  end
+
   # Wrapper around I18n.l to support custom date formats
   def format_date(object, format = :default, options = {})
     date = object.to_date

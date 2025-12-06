@@ -1,14 +1,15 @@
 <%# locals: (chat: nil, message_hint: nil) %>
 
-<div id="chat-form" class="space-y-2">
+<div id="chat-form" class="space-y-2" data-controller="model-selector">
   <% model = chat && chat.persisted? ? [chat, Message.new] : Chat.new %>
+  <% available_models = Provider::Anthropic.available_models %>
+  <% default_model = Provider::Anthropic.default_model %>
 
   <%= form_with model: model,
                 class: "flex lg:flex-col gap-2 bg-container px-2 py-1.5 rounded-full lg:rounded-lg shadow-border-xs",
                 data: { chat_target: "form" } do |f| %>
 
-    <%# In the future, this will be a dropdown with different AI models %>
-    <%= f.hidden_field :ai_model, value: "gpt-4.1" %>
+    <%= f.hidden_field :ai_model, value: default_model, data: { model_selector_target: "input" } %>
 
     <%= f.text_area :content, placeholder: "Ask anything ...", value: message_hint,
                   class: "w-full border-0 focus:ring-0 text-sm resize-none px-1 bg-transparent",
@@ -16,11 +17,26 @@
                   rows: 1 %>
 
     <div class="flex items-center justify-between gap-1">
-      <div class="items-center gap-1 hidden lg:flex">
-        <%# These are disabled for now, but in the future, will all open specific menus with their own context and search %>
-        <% ["plus", "command", "at-sign", "mouse-pointer-click"].each do |icon| %>
-          <%= icon(icon, as_button: true, disabled: true, class: "cursor-not-allowed", title: "Coming soon") %>
-        <% end %>
+      <div class="items-center gap-2 hidden lg:flex">
+        <div class="flex items-center gap-0.5 bg-surface-inset rounded-full p-0.5">
+          <% available_models.each do |model_config| %>
+            <button type="button"
+                    class="model-option px-2.5 py-1 text-xs font-medium rounded-full transition-colors"
+                    data-model-selector-target="option"
+                    data-model-id="<%= model_config[:id] %>"
+                    data-action="click->model-selector#select"
+                    title="<%= model_config[:description] %>">
+              <span class="flex items-center gap-1">
+                <% if model_config[:tier] == :fast %>
+                  <%= icon("zap", size: "xs") %>
+                <% else %>
+                  <%= icon("sparkles", size: "xs") %>
+                <% end %>
+                <%= model_config[:name] %>
+              </span>
+            </button>
+          <% end %>
+        </div>
       </div>
 
       <%= icon("arrow-up", as_button: true, type: "submit") %>

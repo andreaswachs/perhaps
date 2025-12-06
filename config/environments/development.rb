@@ -30,7 +30,13 @@ Rails.application.configure do
   else
     config.action_controller.perform_caching = false
 
-    config.cache_store = :null_store
+    # Use Redis for caching if available (required for GoCardless OAuth flow)
+    # Otherwise fall back to memory_store (null_store doesn't work for OAuth)
+    if ENV["REDIS_URL"].present?
+      config.cache_store = :redis_cache_store, { url: "#{ENV['REDIS_URL'].sub(/\/\d+$/, '')}/3" }
+    else
+      config.cache_store = :memory_store
+    end
   end
 
   # Store uploaded files on the local file system (see config/storage.yml for options).

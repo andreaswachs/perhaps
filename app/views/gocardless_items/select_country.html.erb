@@ -1,0 +1,76 @@
+<%= turbo_frame_tag "modal" do %>
+  <%= render "accounts/new/container", title: "Select your bank", back_path: new_gocardless_item_path do %>
+    <div class="space-y-4">
+      <div class="text-center">
+        <p class="text-sm text-secondary">
+          <%= country_flag_emoji(@country) %> Banks in <%= @country %>
+        </p>
+      </div>
+
+      <% if @institutions.nil? %>
+        <div class="p-4 flex flex-col gap-3 items-center justify-center">
+          <div class="animate-spin">
+            <%= icon "loader", size: "lg", class: "text-secondary" %>
+          </div>
+          <p class="text-secondary text-sm">Loading available banks...</p>
+        </div>
+      <% elsif @institutions.blank? %>
+        <div class="p-4 flex flex-col gap-3 items-center justify-center">
+          <p class="text-primary font-medium text-sm">No banks available</p>
+          <p class="text-secondary text-sm">Could not load banks for this country. Please try again.</p>
+          <%= render DS::Link.new(
+            text: "Go back",
+            href: new_gocardless_item_path,
+            variant: "secondary",
+            frame: "modal"
+          ) %>
+        </div>
+      <% else %>
+        <div data-controller="list-filter">
+          <!-- Search input -->
+          <div class="relative mb-4">
+            <%= icon "search", size: "sm", class: "absolute left-3 top-1/2 -translate-y-1/2 text-secondary" %>
+            <input
+              type="text"
+              id="bank-search-input"
+              placeholder="Search banks..."
+              class="w-full pl-9 pr-4 py-2 text-sm border border-secondary rounded-lg bg-container text-primary placeholder:text-secondary focus:outline-none focus:border-primary"
+              data-list-filter-target="input"
+              data-action="input->list-filter#filter"
+            />
+          </div>
+
+          <!-- No results message -->
+          <p data-list-filter-target="emptyMessage" class="text-sm text-secondary text-center hidden mb-4">
+            No banks found matching your search.
+          </p>
+
+          <div id="bank-list" class="max-h-80 overflow-y-auto space-y-1" data-list-filter-target="list">
+            <% @institutions.each do |institution| %>
+              <%= form_with url: gocardless_items_path, method: :post, scope: :gocardless_item, data: { turbo: false, filter_name: institution["name"] }, class: "bank-item filterable-item" do |f| %>
+                <%= f.hidden_field :institution_id, value: institution["id"] %>
+                <%= f.hidden_field :institution_name, value: institution["name"] %>
+                <button type="submit" class="flex items-center gap-3 w-full p-3 border border-secondary rounded-lg hover:bg-surface hover:border-primary transition-colors text-left bg-container">
+                  <% if institution["logo"].present? %>
+                    <%= image_tag institution["logo"], class: "w-8 h-8 rounded-full object-contain bg-white", loading: "lazy" %>
+                  <% else %>
+                    <div class="w-8 h-8 rounded-full bg-surface flex items-center justify-center">
+                      <span class="text-xs font-medium text-primary"><%= institution["name"]&.first&.upcase %></span>
+                    </div>
+                  <% end %>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-primary truncate"><%= institution["name"] %></p>
+                    <% if institution["transaction_total_days"] %>
+                      <p class="text-xs text-secondary"><%= institution["transaction_total_days"] %> days history</p>
+                    <% end %>
+                  </div>
+                  <%= icon("chevron-right", size: "sm", class: "text-secondary") %>
+                </button>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

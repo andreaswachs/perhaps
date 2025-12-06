@@ -1,0 +1,15 @@
+one:
+  family: dylan_family
+  requisition_id: "req_12345"
+  institution_id: "SANDBOXFINANCE_SFIN0000"
+  name: "Sandbox Finance"
+  status: "linked"
+  access_valid_until: <%= 90.days.from_now %>
+
+expired:
+  family: dylan_family
+  requisition_id: "req_expired"
+  institution_id: "SANDBOXFINANCE_SFIN0000"
+  name: "Expired Bank"
+  status: "expired"
+  access_valid_until: <%= 1.day.ago %>

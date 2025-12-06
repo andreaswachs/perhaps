@@ -12,10 +12,14 @@
         </div>
         <p class="flex items-center flex-wrap gap-1.5 m-0">
           <span class="px-2 py-1 border border-secondary rounded-full">
-            <% if rule.conditions.first.compound? %>
-              <%= rule.conditions.first.sub_conditions.first.filter.label %> <%= rule.conditions.first.sub_conditions.first.operator %> <%= rule.conditions.first.sub_conditions.first.value_display %>
+            <% first_condition = rule.conditions.first %>
+            <% if first_condition.compound? && first_condition.sub_conditions.any? %>
+              <% sub = first_condition.sub_conditions.first %>
+              <%= sub.filter.label %> <%= sub.operator %> <%= sub.value_display %>
+            <% elsif first_condition.compound? %>
+              No conditions defined
             <% else %>
-              <%= rule.conditions.first.filter.label %> <%= rule.conditions.first.operator %> <%= rule.conditions.first.value_display %>
+              <%= first_condition.filter.label %> <%= first_condition.operator %> <%= first_condition.value_display %>
             <% end %>
           </span>
           <% if rule.conditions.count > 1 %>

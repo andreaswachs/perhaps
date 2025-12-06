@@ -22,6 +22,10 @@ class Provider::Registry
       region.to_sym == :us ? plaid_us : plaid_eu
     end
 
+    def gocardless_provider
+      gocardless
+    end
+
     private
       def stripe
         secret_key = ENV["STRIPE_SECRET_KEY"]
@@ -56,16 +60,25 @@ class Provider::Registry
         Provider::Plaid.new(config, region: :eu)
       end
 
+      def gocardless
+        secret_id = ENV["GOCARDLESS_SECRET_ID"]
+        secret_key = ENV["GOCARDLESS_SECRET_KEY"]
+
+        return nil unless secret_id.present? && secret_key.present?
+
+        Provider::Gocardless.new(secret_id: secret_id, secret_key: secret_key)
+      end
+
       def github
         Provider::Github.new
       end
 
-      def openai
-        access_token = ENV.fetch("OPENAI_ACCESS_TOKEN", Setting.openai_access_token)
+      def anthropic
+        api_key = ENV.fetch("ANTHROPIC_API_KEY", Setting.anthropic_api_key)
 
-        return nil unless access_token.present?
+        return nil unless api_key.present?
 
-        Provider::Openai.new(access_token)
+        Provider::Anthropic.new(api_key)
       end
   end
 
@@ -96,9 +109,9 @@ class Provider::Registry
       when :securities
         %i[synth]
       when :llm
-        %i[openai]
+        %i[anthropic]
       else
-        %i[synth plaid_us plaid_eu github openai]
+        %i[synth plaid_us plaid_eu github anthropic]
       end
     end
 end

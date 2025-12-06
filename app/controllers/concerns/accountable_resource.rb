@@ -67,7 +67,7 @@ module AccountableResource
   private
     def set_link_options
       @show_us_link = Current.family.can_connect_plaid_us?
-      @show_eu_link = Current.family.can_connect_plaid_eu?
+      @show_eu_link = Current.family.can_connect_plaid_eu? || Current.family.gocardless_enabled?
     end
 
     def accountable_type

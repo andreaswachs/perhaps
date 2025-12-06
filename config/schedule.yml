@@ -18,3 +18,9 @@ run_security_health_checks:
   class: "SecurityHealthCheckJob"
   queue: "scheduled"
   description: "Runs security health checks to detect issues with security data"
+
+sync_gocardless_accounts:
+  cron: "0 0,6,12,18 * * *" # 4x daily at 0:00, 6:00, 12:00, 18:00 UTC
+  class: "GocardlessSyncJob"
+  queue: "scheduled"
+  description: "Syncs GoCardless-connected bank accounts for European users"
