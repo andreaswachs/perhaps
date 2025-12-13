@@ -4,6 +4,20 @@ on:
   workflow_call:
 
 jobs:
+  scan_secrets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
   scan_ruby:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -82,6 +96,7 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432
       REDIS_URL: redis://localhost:6379
       RAILS_ENV: test
+      PERHAPS_AI_ENABLED: true
 
     services:
       postgres:
