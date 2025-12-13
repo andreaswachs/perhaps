@@ -2,6 +2,12 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
+## 2025-12-13
+- Added Trufflehog secret scanning to CI workflow to detect committed credentials in PRs
+- Fixed CI system test failures: added PERHAPS_AI_ENABLED env for ChatsTest and wait for form submission in TradesTest
+- Fixed GoCardless provider tests by adding Content-Type headers to WebMock stubs for proper JSON parsing
+- Updated GitHub workflows for forked repository (andreaswachs/perhaps) with release-drafter SEMVER tagging and container publishing
+
 ## 2025-12-06
 - Added release-drafter GitHub Action for automated release notes and version tagging via PR labels
 

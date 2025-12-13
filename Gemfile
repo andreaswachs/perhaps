@@ -116,14 +116,14 @@ group :test do
   gem "simplecov", require: false
 end
 
-gem 'activestorage', '>= 7.2.2'
+gem "activestorage", ">= 7.2.2"
 
-gem 'nokogiri', '>= 1.18.9'
+gem "nokogiri", ">= 1.18.9"
 
-gem 'rack', '>= 3.1.18'
+gem "rack", ">= 3.1.18"
 
-gem 'uri', '>= 1.0.4'
+gem "uri", ">= 1.0.4"
 
-gem 'rexml', '>= 3.4.2'
+gem "rexml", ">= 3.4.2"
 
-gem 'thor', '>= 1.4.0'
+gem "thor", ">= 1.4.0"

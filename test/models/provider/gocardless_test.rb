@@ -26,26 +26,26 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "get_institutions returns institution list" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/institutions/?country=GB")
       .to_return(status: 200, body: [
         { id: "SANDBOXFINANCE_SFIN0000", name: "Sandbox Finance", countries: [ "GB" ], logo: "https://example.com/logo.png" }
-      ].to_json)
+      ].to_json, headers: { "Content-Type" => "application/json" })
 
     institutions = @gocardless.get_institutions(country: "GB")
 
     assert_equal 1, institutions.size
-    assert_equal "SANDBOXFINANCE_SFIN0000", institutions.first[:id]
-    assert_equal "Sandbox Finance", institutions.first[:name]
+    assert_equal "SANDBOXFINANCE_SFIN0000", institutions.first["id"]
+    assert_equal "Sandbox Finance", institutions.first["name"]
   end
 
   test "create_end_user_agreement returns agreement" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/agreements/enduser/")
-      .to_return(status: 200, body: { id: "agreement_123", institution_id: "BANK_ID", max_historical_days: 90 }.to_json)
+      .to_return(status: 200, body: { id: "agreement_123", institution_id: "BANK_ID", max_historical_days: 90 }.to_json, headers: { "Content-Type" => "application/json" })
 
     agreement = @gocardless.create_end_user_agreement(institution_id: "BANK_ID")
 
@@ -54,14 +54,14 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "create_requisition returns requisition with link" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/requisitions/")
       .to_return(status: 200, body: {
         id: "req_123",
         link: "https://ob.gocardless.com/psd2/start/req_123",
         status: "CR"
-      }.to_json)
+      }.to_json, headers: { "Content-Type" => "application/json" })
 
     requisition = @gocardless.create_requisition(
       institution_id: "BANK_ID",
@@ -76,14 +76,14 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "get_requisition returns requisition details" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/requisitions/req_123/")
       .to_return(status: 200, body: {
         id: "req_123",
         status: "LN",
         accounts: [ "acc_1", "acc_2" ]
-      }.to_json)
+      }.to_json, headers: { "Content-Type" => "application/json" })
 
     requisition = @gocardless.get_requisition("req_123")
 
@@ -94,7 +94,7 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "get_account_details returns account info" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/accounts/acc_123/details/")
       .to_return(status: 200, body: {
@@ -103,24 +103,24 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
           name: "Main Account",
           currency: "GBP"
         }
-      }.to_json)
+      }.to_json, headers: { "Content-Type" => "application/json" })
 
     details = @gocardless.get_account_details("acc_123")
 
-    assert_equal "GB33BUKB20201555555555", details["account"]["iban"]
-    assert_equal "GBP", details["account"]["currency"]
+    assert_equal "GB33BUKB20201555555555", details["iban"]
+    assert_equal "GBP", details["currency"]
   end
 
   test "get_account_balances returns balance info" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/accounts/acc_123/balances/")
       .to_return(status: 200, body: {
         balances: [
           { balanceAmount: { amount: "1500.50", currency: "GBP" }, balanceType: "expected" }
         ]
-      }.to_json)
+      }.to_json, headers: { "Content-Type" => "application/json" })
 
     balances = @gocardless.get_account_balances("acc_123")
 
@@ -130,10 +130,9 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "get_account_transactions returns transaction list" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
-    stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/accounts/acc_123/transactions/")
-      .with(query: { date_from: "2024-01-01", date_to: "2024-01-31" })
+    stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/accounts/acc_123/transactions/?date_from=2024-01-01&date_to=2024-01-31")
       .to_return(status: 200, body: {
         transactions: {
           booked: [
@@ -141,7 +140,7 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
           ],
           pending: []
         }
-      }.to_json)
+      }.to_json, headers: { "Content-Type" => "application/json" })
 
     transactions = @gocardless.get_account_transactions("acc_123", date_from: "2024-01-01", date_to: "2024-01-31")
 
@@ -151,10 +150,10 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "delete_requisition removes requisition" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:delete, "https://bankaccountdata.gocardless.com/api/v2/requisitions/req_123/")
-      .to_return(status: 200, body: { summary: "Requisition deleted" }.to_json)
+      .to_return(status: 200, body: { summary: "Requisition deleted" }.to_json, headers: { "Content-Type" => "application/json" })
 
     response = @gocardless.delete_requisition("req_123")
 
@@ -163,10 +162,10 @@ class Provider::GocardlessTest < ActiveSupport::TestCase
 
   test "raises error on API failure" do
     stub_request(:post, "https://bankaccountdata.gocardless.com/api/v2/token/new/")
-      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json)
+      .to_return(status: 200, body: { access: "token", access_expires: 86400, refresh: "refresh", refresh_expires: 604800 }.to_json, headers: { "Content-Type" => "application/json" })
 
     stub_request(:get, "https://bankaccountdata.gocardless.com/api/v2/institutions/?country=XX")
-      .to_return(status: 400, body: { detail: "Invalid country code" }.to_json)
+      .to_return(status: 400, body: { detail: "Invalid country code" }.to_json, headers: { "Content-Type" => "application/json" })
 
     error = assert_raises(Provider::Gocardless::Error) do
       @gocardless.get_institutions(country: "XX")
