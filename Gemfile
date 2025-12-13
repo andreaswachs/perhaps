@@ -115,3 +115,15 @@ group :test do
   gem "climate_control"
   gem "simplecov", require: false
 end
+
+gem 'activestorage', '>= 7.2.2'
+
+gem 'nokogiri', '>= 1.18.9'
+
+gem 'rack', '>= 3.1.18'
+
+gem 'uri', '>= 1.0.4'
+
+gem 'rexml', '>= 3.4.2'
+
+gem 'thor', '>= 1.4.0'

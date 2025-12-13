@@ -126,7 +126,76 @@
         22
       ],
       "note": ""
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "2febb1c08a2a56d47c7e6fd66b95388a0067eb71aeba9acd73bb48d807c37acf",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/gocardless_items_controller.rb",
+      "line": 40,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Current.family.create_gocardless_link(:institution_id => gocardless_params[:institution_id], :redirect_url => gocardless_callback_url)[:link], :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GocardlessItemsController",
+        "method": "create"
+      },
+      "user_input": "Current.family.create_gocardless_link(:institution_id => gocardless_params[:institution_id], :redirect_url => gocardless_callback_url)[:link]",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "Redirect URL comes from GoCardless OAuth API - this is expected behavior for OAuth flow"
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "473e3117b470d7eb3bd7d613245d1fd8f594f32a36b38198149bfbe68332ede4",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/provider/gocardless.rb",
+      "line": 99,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.delete(\"requisitions/#{requisition_id}/\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Provider::Gocardless",
+        "method": "delete_requisition"
+      },
+      "user_input": "requisition_id",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "False positive - this is an HTTP DELETE request to a REST API endpoint (Faraday), not SQL. The connection.delete is Faraday HTTP client, not ActiveRecord."
+    },
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "53bc1fb3d2b9803d734cc135cc964f0a358196afd783b57215a3e4a13bec079c",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/gocardless_items_controller.rb",
+      "line": 126,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Current.family.create_gocardless_link(:institution_id => Current.family.gocardless_items.find(params[:id]).institution_id, :redirect_url => gocardless_callback_url)[:link], :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GocardlessItemsController",
+        "method": "reconnect"
+      },
+      "user_input": "Current.family.create_gocardless_link(:institution_id => Current.family.gocardless_items.find(params[:id]).institution_id, :redirect_url => gocardless_callback_url)[:link]",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": "Redirect URL comes from GoCardless OAuth API - this is expected behavior for OAuth reconnection flow"
     }
   ],
-  "brakeman_version": "7.1.0"
+  "brakeman_version": "7.1.1"
 }

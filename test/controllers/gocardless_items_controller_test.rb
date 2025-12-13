@@ -11,7 +11,7 @@ class GocardlessItemsControllerTest < ActionDispatch::IntegrationTest
     get new_gocardless_item_url
 
     assert_response :success
-    assert_select "h2", "Connect European Bank"
+    assert_select "span.text-primary", "Connect European Bank"
   end
 
   test "select_country shows institutions" do
@@ -25,6 +25,8 @@ class GocardlessItemsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "create redirects to GoCardless OAuth" do
+    reference = SecureRandom.uuid
+
     @gocardless_provider.expects(:create_end_user_agreement)
       .with(institution_id: "BANK_1")
       .returns({ "id" => "agreement_123" })
@@ -32,6 +34,7 @@ class GocardlessItemsControllerTest < ActionDispatch::IntegrationTest
     @gocardless_provider.expects(:create_requisition)
       .returns({
         "id" => "req_123",
+        "reference" => reference,
         "link" => "https://ob.gocardless.com/psd2/start/req_123"
       })
 
@@ -43,44 +46,58 @@ class GocardlessItemsControllerTest < ActionDispatch::IntegrationTest
     }
 
     assert_redirected_to "https://ob.gocardless.com/psd2/start/req_123"
-    assert_equal "req_123", session[:pending_gocardless_requisition][:requisition_id]
   end
 
   test "callback creates gocardless item" do
+    reference = SecureRandom.uuid
+    cache_key = "gocardless_pending_requisition:#{reference}"
+
+    # Mock the cache read to return our pending data
+    # (Test environment uses null_store so real caching doesn't work)
+    pending_data = {
+      requisition_id: "req_123",
+      institution_id: "BANK_1",
+      institution_name: "Test Bank",
+      family_id: @user.family_id
+    }
+
+    Rails.cache.stubs(:read).with(cache_key).returns(pending_data)
+    Rails.cache.stubs(:delete).with(cache_key)
+
     @gocardless_provider.expects(:get_requisition).with("req_123").returns({
       "id" => "req_123",
       "status" => "LN",
-      "accounts" => ["acc_1"]
+      "institution_id" => "BANK_1",
+      "accounts" => [ "acc_1" ]
     })
 
-    # Set up session
-    session_data = {
-      requisition_id: "req_123",
-      institution_id: "BANK_1",
-      institution_name: "Test Bank"
-    }
+    # Stub sync_later to avoid background job issues
+    GocardlessItem.any_instance.stubs(:sync_later)
 
-    # We need to use a different approach since session isn't directly settable
-    # Store in session via the create action first, then test callback
     assert_difference "GocardlessItem.count", 1 do
-      get callback_gocardless_items_url,
-        headers: { "rack.session" => { pending_gocardless_requisition: session_data } }
+      get callback_gocardless_items_url(ref: reference)
     end
 
     assert_redirected_to accounts_path
     assert_equal "Bank connected successfully. Your accounts will appear shortly.", flash[:notice]
   end
 
-  test "callback handles missing session" do
+  test "callback handles missing reference" do
     get callback_gocardless_items_url
+
+    assert_redirected_to accounts_path
+    assert_equal "Invalid callback. Please try connecting your bank again.", flash[:alert]
+  end
+
+  test "callback handles expired cache" do
+    get callback_gocardless_items_url(ref: "nonexistent_ref")
 
     assert_redirected_to accounts_path
     assert_equal "Session expired. Please try connecting your bank again.", flash[:alert]
   end
 
   test "callback handles error param" do
-    get callback_gocardless_items_url(error: "access_denied"),
-      headers: { "rack.session" => { pending_gocardless_requisition: { requisition_id: "req_123" } } }
+    get callback_gocardless_items_url(error: "access_denied")
 
     assert_redirected_to accounts_path
     assert_equal "Bank connection failed: access_denied", flash[:alert]

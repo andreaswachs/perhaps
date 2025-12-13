@@ -50,12 +50,12 @@ class GocardlessAccount < ApplicationRecord
 
   private
 
-  def find_balance(balances, type)
-    balances.find { |b| b["balanceType"] == type }
-  end
+    def find_balance(balances, type)
+      balances.find { |b| b["balanceType"] == type }
+    end
 
-  def log_missing_balance_warning
-    return if current_balance.present? || available_balance.present?
-    Rails.logger.warn("GocardlessAccount #{id} has no balance data - will populate on next sync")
-  end
+    def log_missing_balance_warning
+      return if current_balance.present? || available_balance.present?
+      Rails.logger.warn("GocardlessAccount #{id} has no balance data - will populate on next sync")
+    end
 end

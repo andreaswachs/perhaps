@@ -143,81 +143,81 @@ class Provider::Gocardless
 
   private
 
-  attr_reader :secret_id, :secret_key
+    attr_reader :secret_id, :secret_key
 
-  def connection
-    @connection ||= Faraday.new(url: BASE_URL) do |f|
-      f.request :json
-      f.response :json
-      f.adapter Faraday.default_adapter
-    end
-  end
-
-  def with_authentication
-    authenticate! if token_expired?
-
-    connection.headers["Authorization"] = "Bearer #{@access_token}"
-
-    yield
-  end
-
-  def authenticate!
-    response = Faraday.post("#{BASE_URL}/token/new/") do |req|
-      req.headers["Content-Type"] = "application/json"
-      req.body = { secret_id: secret_id, secret_key: secret_key }.to_json
-    end
-
-    if response.success?
-      data = JSON.parse(response.body)
-      @access_token = data["access"]
-      @token_expires_at = Time.current + data["access_expires"].to_i.seconds
-    else
-      error_data = begin
-        JSON.parse(response.body)
-      rescue
-        { "detail" => response.body }
+    def connection
+      @connection ||= Faraday.new(url: BASE_URL) do |f|
+        f.request :json
+        f.response :json
+        f.adapter Faraday.default_adapter
       end
-      raise Error.new(
-        "GoCardless authentication failed: #{error_data['detail'] || response.status}",
-        code: "AUTH_FAILED",
-        details: error_data
-      )
     end
-  end
 
-  def token_expired?
-    @access_token.nil? || @token_expires_at.nil? || @token_expires_at < Time.current
-  end
+    def with_authentication
+      authenticate! if token_expired?
 
-  def handle_response(response)
-    case response.status
-    when 200..299
-      response.body
-    when 401
-      raise Error.new("Authentication failed", code: "AUTH_FAILED", details: response.body)
-    when 404
-      raise Error.new("Resource not found", code: "NOT_FOUND", details: response.body)
-    when 409
-      error_detail = extract_error_detail(response.body)
-      raise Error.new(
-        "Conflict: #{error_detail}",
-        code: response.body.dig("type") || "CONFLICT",
-        details: response.body
-      )
-    else
-      error_detail = extract_error_detail(response.body)
-      error_code = response.body.is_a?(Hash) ? (response.body["type"] || response.body["code"]) : nil
+      connection.headers["Authorization"] = "Bearer #{@access_token}"
 
-      raise Error.new(
-        "GoCardless API error (#{response.status}): #{error_detail}",
-        code: error_code || response.status,
-        details: response.body
-      )
+      yield
     end
-  end
 
-  def extract_error_detail(body)
-    return body unless body.is_a?(Hash)
-    body["detail"] || body["summary"] || body["message"] || body.to_s
-  end
+    def authenticate!
+      response = Faraday.post("#{BASE_URL}/token/new/") do |req|
+        req.headers["Content-Type"] = "application/json"
+        req.body = { secret_id: secret_id, secret_key: secret_key }.to_json
+      end
+
+      if response.success?
+        data = JSON.parse(response.body)
+        @access_token = data["access"]
+        @token_expires_at = Time.current + data["access_expires"].to_i.seconds
+      else
+        error_data = begin
+          JSON.parse(response.body)
+        rescue
+          { "detail" => response.body }
+        end
+        raise Error.new(
+          "GoCardless authentication failed: #{error_data['detail'] || response.status}",
+          code: "AUTH_FAILED",
+          details: error_data
+        )
+      end
+    end
+
+    def token_expired?
+      @access_token.nil? || @token_expires_at.nil? || @token_expires_at < Time.current
+    end
+
+    def handle_response(response)
+      case response.status
+      when 200..299
+        response.body
+      when 401
+        raise Error.new("Authentication failed", code: "AUTH_FAILED", details: response.body)
+      when 404
+        raise Error.new("Resource not found", code: "NOT_FOUND", details: response.body)
+      when 409
+        error_detail = extract_error_detail(response.body)
+        raise Error.new(
+          "Conflict: #{error_detail}",
+          code: response.body.dig("type") || "CONFLICT",
+          details: response.body
+        )
+      else
+        error_detail = extract_error_detail(response.body)
+        error_code = response.body.is_a?(Hash) ? (response.body["type"] || response.body["code"]) : nil
+
+        raise Error.new(
+          "GoCardless API error (#{response.status}): #{error_detail}",
+          code: error_code || response.status,
+          details: response.body
+        )
+      end
+    end
+
+    def extract_error_detail(body)
+      return body unless body.is_a?(Hash)
+      body["detail"] || body["summary"] || body["message"] || body.to_s
+    end
 end

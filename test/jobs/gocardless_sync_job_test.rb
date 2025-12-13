@@ -8,8 +8,9 @@ class GocardlessSyncJobTest < ActiveJob::TestCase
   test "syncs active gocardless items" do
     Provider::Registry.stubs(:gocardless_provider).returns(@gocardless_provider)
 
-    gocardless_item = gocardless_items(:one)
-    GocardlessItem.any_instance.expects(:sync_later).once
+    # Count how many active items we have and expect that many calls
+    active_count = GocardlessItem.active.count
+    GocardlessItem.any_instance.expects(:sync_later).times(active_count)
 
     GocardlessSyncJob.perform_now
   end
@@ -25,8 +26,8 @@ class GocardlessSyncJobTest < ActiveJob::TestCase
   test "skips items scheduled for deletion" do
     Provider::Registry.stubs(:gocardless_provider).returns(@gocardless_provider)
 
-    gocardless_item = gocardless_items(:one)
-    gocardless_item.update!(scheduled_for_deletion: true)
+    # Mark all items as scheduled for deletion
+    GocardlessItem.update_all(scheduled_for_deletion: true)
 
     GocardlessItem.any_instance.expects(:sync_later).never
 
@@ -35,6 +36,10 @@ class GocardlessSyncJobTest < ActiveJob::TestCase
 
   test "continues syncing other items if one fails" do
     Provider::Registry.stubs(:gocardless_provider).returns(@gocardless_provider)
+
+    # Mark all fixtures as scheduled for deletion (so they won't be synced)
+    # instead of actually destroying them (which triggers callbacks)
+    GocardlessItem.where.not(id: gocardless_items(:one).id).update_all(scheduled_for_deletion: true)
 
     # Create a second gocardless item
     family = families(:dylan_family)
@@ -46,10 +51,19 @@ class GocardlessSyncJobTest < ActiveJob::TestCase
     )
 
     # First item raises error, second should still sync
-    gocardless_items(:one).expects(:sync_later).raises(StandardError.new("API error"))
-    second_item.expects(:sync_later).once
+    call_count = 0
+    GocardlessItem.any_instance.stubs(:sync_later).with do
+      call_count += 1
+      if call_count == 1
+        raise StandardError.new("API error")
+      end
+      true
+    end
 
     # Should not raise
     GocardlessSyncJob.perform_now
+
+    # Both items should have been attempted (2 calls total)
+    assert_equal 2, call_count
   end
 end

@@ -1,0 +1,79 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-5-20250929","max_tokens":4096,"messages":[{"role":"user","content":"What
+        is my net worth?"}],"system":"Use the tools available to you to answer the
+        user''s question.","tools":[{"name":"get_net_worth","description":"Gets a
+        user''s net worth","input_schema":{"type":"object","properties":{},"required":[],"additionalProperties":false}}]}'
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - application/json
+      User-Agent:
+      - Anthropic::Client/Ruby 1.16.0
+      Host:
+      - api.anthropic.com
+      X-Stainless-Arch:
+      - arm64
+      X-Stainless-Lang:
+      - ruby
+      X-Stainless-Os:
+      - MacOS
+      X-Stainless-Package-Version:
+      - 1.16.0
+      X-Stainless-Runtime:
+      - ruby
+      X-Stainless-Runtime-Version:
+      - 3.4.4
+      Content-Type:
+      - application/json
+      Anthropic-Version:
+      - '2023-06-01'
+      X-Api-Key:
+      - test-anthropic-key
+      X-Stainless-Retry-Count:
+      - '0'
+      X-Stainless-Timeout:
+      - '600.0'
+      Content-Length:
+      - '359'
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Date:
+      - Sat, 06 Dec 2025 14:29:49 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '130'
+      Connection:
+      - keep-alive
+      Cf-Ray:
+      - 9a9c7a4a5e39eb51-CPH
+      X-Should-Retry:
+      - 'false'
+      Request-Id:
+      - req_011CVqbMUnD2Ci5yx3P3vhPL
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Envoy-Upstream-Service-Time:
+      - '10'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+    body:
+      encoding: UTF-8
+      string: '{"type":"error","error":{"type":"authentication_error","message":"invalid
+        x-api-key"},"request_id":"req_011CVqbMUnD2Ci5yx3P3vhPL"}'
+  recorded_at: Sat, 06 Dec 2025 14:29:49 GMT
+recorded_with: VCR 6.3.1

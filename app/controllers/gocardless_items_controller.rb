@@ -144,21 +144,21 @@ class GocardlessItemsController < ApplicationController
 
   private
 
-  def set_gocardless_item
-    @gocardless_item = Current.family.gocardless_items.find(params[:id])
-  end
+    def set_gocardless_item
+      @gocardless_item = Current.family.gocardless_items.find(params[:id])
+    end
 
-  def gocardless_params
-    params.require(:gocardless_item).permit(:institution_id, :institution_name)
-  end
+    def gocardless_params
+      params.require(:gocardless_item).permit(:institution_id, :institution_name)
+    end
 
-  def gocardless_callback_url
-    return callback_gocardless_items_url if Rails.env.production?
+    def gocardless_callback_url
+      return callback_gocardless_items_url if Rails.env.production?
 
-    ENV.fetch("DEV_CALLBACK_URL", root_url.chomp("/")) + "/gocardless_items/callback"
-  end
+      ENV.fetch("DEV_CALLBACK_URL", root_url.chomp("/")) + "/gocardless_items/callback"
+    end
 
-  def gocardless_cache_key(reference)
-    "gocardless_pending_requisition:#{reference}"
-  end
+    def gocardless_cache_key(reference)
+      "gocardless_pending_requisition:#{reference}"
+    end
 end

@@ -27,9 +27,9 @@ class GocardlessAccount::Transactions::CategoryMatcher
 
   private
 
-  attr_reader :user_categories
+    attr_reader :user_categories
 
-  def normalize(str)
-    str.to_s.downcase.gsub(/[^a-z0-9]/, " ").squish
-  end
+    def normalize(str)
+      str.to_s.downcase.gsub(/[^a-z0-9]/, " ").squish
+    end
 end

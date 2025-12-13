@@ -17,29 +17,29 @@ class GocardlessAccount::Transactions::Processor
 
   private
 
-  attr_reader :gocardless_account
+    attr_reader :gocardless_account
 
-  def category_matcher
-    @category_matcher ||= GocardlessAccount::Transactions::CategoryMatcher.new(family_categories)
-  end
-
-  def family_categories
-    @family_categories ||= begin
-      if account.family.categories.none?
-        account.family.categories.bootstrap!
-      end
-
-      account.family.categories
+    def category_matcher
+      @category_matcher ||= GocardlessAccount::Transactions::CategoryMatcher.new(family_categories)
     end
-  end
 
-  def account
-    gocardless_account.account
-  end
+    def family_categories
+      @family_categories ||= begin
+        if account.family.categories.none?
+          account.family.categories.bootstrap!
+        end
 
-  # GoCardless separates booked (confirmed) from pending transactions
-  # We only process booked transactions as they are finalized
-  def booked_transactions
-    gocardless_account.raw_transactions_payload.dig("transactions", "booked") || []
-  end
+        account.family.categories
+      end
+    end
+
+    def account
+      gocardless_account.account
+    end
+
+    # GoCardless separates booked (confirmed) from pending transactions
+    # We only process booked transactions as they are finalized
+    def booked_transactions
+      gocardless_account.raw_transactions_payload.dig("transactions", "booked") || []
+    end
 end

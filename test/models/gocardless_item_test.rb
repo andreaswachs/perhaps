@@ -18,7 +18,7 @@ class GocardlessItemTest < ActiveSupport::TestCase
   end
 
   test "continues destruction if requisition not found" do
-    error = Provider::Gocardless::Error.new("Not found", 404)
+    error = Provider::Gocardless::Error.new("Not found", code: 404)
     @gocardless_provider.expects(:delete_requisition).raises(error)
 
     assert_difference "GocardlessItem.count", -1 do

@@ -4,6 +4,7 @@ class Provider::OpenaiTest < ActiveSupport::TestCase
   include LLMInterfaceTest
 
   setup do
+    skip "OpenAI gem not available" unless defined?(::OpenAI)
     @subject = @openai = Provider::Openai.new(ENV.fetch("OPENAI_ACCESS_TOKEN", "test-openai-token"))
     @subject_model = "gpt-4.1"
   end

@@ -40,7 +40,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     budget = budgets(:one)
     plaid_item = plaid_items(:one)
 
-    Provider::Plaid.any_instance.expects(:remove_item).with(plaid_item.access_token).once
+    plaid_provider = mock
+    plaid_provider.expects(:remove_item).with(plaid_item.access_token).once
+    Provider::Registry.stubs(:plaid_provider_for_region).returns(plaid_provider)
 
     perform_enqueued_jobs(only: FamilyResetJob) do
       delete reset_user_url(@user)

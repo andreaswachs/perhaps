@@ -12,17 +12,17 @@ class GocardlessAccount::Importer
 
   private
 
-  attr_reader :gocardless_account, :account_snapshot
+    attr_reader :gocardless_account, :account_snapshot
 
-  def import_account_info
-    gocardless_account.upsert_gocardless_snapshot!(account_snapshot.account_data)
-  end
+    def import_account_info
+      gocardless_account.upsert_gocardless_snapshot!(account_snapshot.account_data)
+    end
 
-  def import_balances
-    gocardless_account.upsert_gocardless_balances_snapshot!(account_snapshot.balances_data)
-  end
+    def import_balances
+      gocardless_account.upsert_gocardless_balances_snapshot!(account_snapshot.balances_data)
+    end
 
-  def import_transactions
-    gocardless_account.upsert_gocardless_transactions_snapshot!(account_snapshot.transactions_data)
-  end
+    def import_transactions
+      gocardless_account.upsert_gocardless_transactions_snapshot!(account_snapshot.transactions_data)
+    end
 end

@@ -16,6 +16,6 @@ class CreateGocardlessItems < ActiveRecord::Migration[7.2]
     end
 
     add_index :gocardless_items, :requisition_id, unique: true
-    add_index :gocardless_items, [:family_id, :status]
+    add_index :gocardless_items, [ :family_id, :status ]
   end
 end

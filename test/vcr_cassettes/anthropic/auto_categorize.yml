@@ -1,0 +1,104 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-sonnet-4-5-20250929","max_tokens":4096,"system":"You
+        are an assistant to a consumer personal finance app. You will be provided
+        a list\nof the user''s transactions and a list of the user''s categories.
+        Your job is to auto-categorize\neach transaction.\n\nClosely follow ALL the
+        rules below while auto-categorizing:\n\n- Return 1 result per transaction\n-
+        Correlate each transaction by ID (transaction_id)\n- Attempt to match the
+        most specific category possible (i.e. subcategory over parent category)\n-
+        Category and transaction classifications should match (i.e. if transaction
+        is an \"expense\", the category must have classification of \"expense\")\n-
+        If you don''t know the category, return \"null\"\n  - You should always favor
+        \"null\" over false positives\n  - Be slightly pessimistic. Only match a category
+        if you''re 60%+ confident it is the correct one.\n- Each transaction has varying
+        metadata that can be used to determine the category\n  - Note: \"hint\" comes
+        from 3rd party aggregators and typically represents a category name that\n    may
+        or may not match any of the user-supplied categories\n","messages":[{"role":"user","content":"Here
+        are the user''s available categories in JSON format:\n\n```json\n[{\"id\":\"shopping_id\",\"name\":\"Shopping\",\"is_subcategory\":false,\"parent_id\":null,\"classification\":\"expense\"},{\"id\":\"subscriptions_id\",\"name\":\"Subscriptions\",\"is_subcategory\":true,\"parent_id\":null,\"classification\":\"expense\"},{\"id\":\"restaurants_id\",\"name\":\"Restaurants\",\"is_subcategory\":false,\"parent_id\":null,\"classification\":\"expense\"},{\"id\":\"fast_food_id\",\"name\":\"Fast
+        Food\",\"is_subcategory\":true,\"parent_id\":\"restaurants_id\",\"classification\":\"expense\"},{\"id\":\"income_id\",\"name\":\"Income\",\"is_subcategory\":false,\"parent_id\":null,\"classification\":\"income\"}]\n```\n\nUse
+        the available categories to auto-categorize the following transactions:\n\n```json\n[{\"id\":\"1\",\"name\":\"McDonalds\",\"amount\":20,\"classification\":\"expense\",\"merchant\":\"McDonalds\",\"hint\":\"Fast
+        Food\"},{\"id\":\"2\",\"name\":\"Amazon purchase\",\"amount\":100,\"classification\":\"expense\",\"merchant\":\"Amazon\"},{\"id\":\"3\",\"name\":\"Netflix
+        subscription\",\"amount\":10,\"classification\":\"expense\",\"merchant\":\"Netflix\",\"hint\":\"Subscriptions\"},{\"id\":\"4\",\"name\":\"paycheck\",\"amount\":3000,\"classification\":\"income\"},{\"id\":\"5\",\"name\":\"Italian
+        dinner with friends\",\"amount\":100,\"classification\":\"expense\"},{\"id\":\"6\",\"name\":\"1212XXXBCaaa
+        charge\",\"amount\":2.99,\"classification\":\"expense\"}]\n```\n\nUse the
+        submit_categorizations tool to return your results. For each transaction,
+        match it to the most appropriate category from the user''s categories. Use
+        \"null\" as the category_name if you cannot find a good match.\n"}],"tools":[{"name":"submit_categorizations","description":"Submit
+        the categorization results for each transaction","input_schema":{"type":"object","properties":{"categorizations":{"type":"array","description":"An
+        array of auto-categorizations for each transaction","items":{"type":"object","properties":{"transaction_id":{"type":"string","description":"The
+        internal ID of the original transaction"},"category_name":{"type":"string","description":"The
+        matched category name of the transaction, or ''null'' if no match"}},"required":["transaction_id","category_name"]}}},"required":["categorizations"]}}],"tool_choice":{"type":"tool","name":"submit_categorizations"}}'
+    headers:
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - application/json
+      User-Agent:
+      - Anthropic::Client/Ruby 1.16.0
+      Host:
+      - api.anthropic.com
+      X-Stainless-Arch:
+      - arm64
+      X-Stainless-Lang:
+      - ruby
+      X-Stainless-Os:
+      - MacOS
+      X-Stainless-Package-Version:
+      - 1.16.0
+      X-Stainless-Runtime:
+      - ruby
+      X-Stainless-Runtime-Version:
+      - 3.4.4
+      Content-Type:
+      - application/json
+      Anthropic-Version:
+      - '2023-06-01'
+      X-Api-Key:
+      - test-anthropic-key
+      X-Stainless-Retry-Count:
+      - '0'
+      X-Stainless-Timeout:
+      - '600.0'
+      Content-Length:
+      - '3532'
+  response:
+    status:
+      code: 401
+      message: Unauthorized
+    headers:
+      Date:
+      - Sat, 06 Dec 2025 14:29:49 GMT
+      Content-Type:
+      - application/json
+      Content-Length:
+      - '130'
+      Connection:
+      - keep-alive
+      Cf-Ray:
+      - 9a9c7a4a695145f8-CPH
+      X-Should-Retry:
+      - 'false'
+      Request-Id:
+      - req_011CVqbMUohfrtaqKfHeXArZ
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      X-Envoy-Upstream-Service-Time:
+      - '11'
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+    body:
+      encoding: UTF-8
+      string: '{"type":"error","error":{"type":"authentication_error","message":"invalid
+        x-api-key"},"request_id":"req_011CVqbMUohfrtaqKfHeXArZ"}'
+  recorded_at: Sat, 06 Dec 2025 14:29:49 GMT
+recorded_with: VCR 6.3.1

@@ -4,8 +4,9 @@ one:
   iban: "GB33BUKB20201555555555"
   name: "Main Checking"
   currency: "EUR"
-  balance: 1500.50
-  balance_date: <%= Date.current %>
+  current_balance: 1500.50
+  available_balance: 1400.00
   account_type: "CACC"
   raw_payload: {}
+  raw_balances_payload: {}
   raw_transactions_payload: []

@@ -81,7 +81,7 @@ module Family::GocardlessConnectable
 
   private
 
-  def gocardless_provider
-    Provider::Registry.gocardless_provider
-  end
+    def gocardless_provider
+      Provider::Registry.gocardless_provider
+    end
 end

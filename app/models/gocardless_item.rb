@@ -72,21 +72,21 @@ class GocardlessItem < ApplicationRecord
 
   private
 
-  def remove_gocardless_requisition
-    gocardless_provider.delete_requisition(requisition_id)
-  rescue Provider::Gocardless::Error => e
-    # If requisition not found, it was already deleted - continue with local deletion
-    raise e unless e.not_found?
-  end
-
-  def map_status(gocardless_status)
-    case gocardless_status
-    when "CR" then :pending
-    when "LN" then :linked
-    when "EX" then :expired
-    when "SU" then :suspended
-    when "RJ", "UA" then :expired
-    else :pending
+    def remove_gocardless_requisition
+      gocardless_provider.delete_requisition(requisition_id)
+    rescue Provider::Gocardless::Error => e
+      # If requisition not found, it was already deleted - continue with local deletion
+      raise e unless e.not_found?
     end
-  end
+
+    def map_status(gocardless_status)
+      case gocardless_status
+      when "CR" then :pending
+      when "LN" then :linked
+      when "EX" then :expired
+      when "SU" then :suspended
+      when "RJ", "UA" then :expired
+      else :pending
+      end
+    end
 end
