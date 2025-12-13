@@ -43,3 +43,22 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Ignore test files
+/test
+/spec
+
+# Ignore documentation
+/docs
+/CONTRIBUTING.md
+/CHANGES.md
+/CLAUDE.md
+
+# Ignore development tools
+/.vscode
+/.idea
+/.devcontainer
+
+# Ignore other unnecessary files
+*.md
+!README.md

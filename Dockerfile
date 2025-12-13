@@ -16,7 +16,7 @@ ARG BUILD_COMMIT_SHA
 ENV RAILS_ENV="production" \
     BUNDLE_DEPLOYMENT="1" \
     BUNDLE_PATH="/usr/local/bundle" \
-    BUNDLE_WITHOUT="development" \
+    BUNDLE_WITHOUT="development:test" \
     BUILD_COMMIT_SHA=${BUILD_COMMIT_SHA}
     
 # Throw-away build stage to reduce size of final image
@@ -27,11 +27,9 @@ RUN apt-get install --no-install-recommends -y build-essential libpq-dev git pkg
 
 # Install application gems
 COPY .ruby-version Gemfile Gemfile.lock ./
-RUN bundle install
-
-RUN rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git
-
-RUN bundle exec bootsnap precompile --gemfile -j 0
+RUN bundle install && \
+    rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
+    bundle exec bootsnap precompile --gemfile -j 0
 
 # Copy application code
 COPY . .
@@ -51,6 +49,29 @@ RUN rm -rf /var/lib/apt/lists /var/cache/apt/archives
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
+
+# Remove unnecessary files from final image to reduce size
+RUN rm -rf /rails/tmp/cache \
+    /rails/tmp/*.pid \
+    /rails/spec \
+    /rails/test \
+    /rails/doc \
+    /rails/docs \
+    /rails/.git \
+    /rails/*.md \
+    /rails/CONTRIBUTING.md \
+    /rails/CHANGES.md \
+    /rails/CLAUDE.md \
+    /rails/.github \
+    /rails/.vscode \
+    /rails/.idea \
+    /rails/.devcontainer \
+    /rails/Dockerfile* \
+    /rails/.dockerignore \
+    "${BUNDLE_PATH}"/ruby/*/gems/*/test \
+    "${BUNDLE_PATH}"/ruby/*/gems/*/spec \
+    "${BUNDLE_PATH}"/ruby/*/gems/*/docs \
+    "${BUNDLE_PATH}"/ruby/*/gems/*/*.md
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \

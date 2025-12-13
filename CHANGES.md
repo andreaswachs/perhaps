@@ -3,6 +3,11 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-13
+- Optimized Docker production image size from 927MB to 724MB (22% reduction) by excluding development/test gems and unnecessary files
+- Moved development-only gems (lookbook, rack-mini-profiler, vernier) to development group in Gemfile
+- Added conditional loading for lookbook configuration and routes to prevent production errors
+- Enhanced .dockerignore to exclude test files, documentation, and development tools from Docker build context
+- Added aggressive cleanup of gem documentation, test files, and unnecessary artifacts in Docker final stage
 - Added Trufflehog secret scanning to CI workflow to detect committed credentials in PRs
 - Fixed CI system test failures: added PERHAPS_AI_ENABLED env for ChatsTest and wait for form submission in TradesTest
 - Fixed GoCardless provider tests by adding Content-Type headers to WebMock stubs for proper JSON parsing

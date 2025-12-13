@@ -39,10 +39,12 @@ module Perhaps
       Rails.logger&.warn("Credentials file not available or invalid - skipping encrypted configuration")
     end
 
-    config.view_component.preview_controller = "LookbooksController"
-    config.lookbook.preview_display_options = {
-      theme: [ "light", "dark" ] # available in view as params[:theme]
-    }
+    if Rails.env.development?
+      config.view_component.preview_controller = "LookbooksController"
+      config.lookbook.preview_display_options = {
+        theme: [ "light", "dark" ] # available in view as params[:theme]
+      }
+    end
 
     # Enable Rack::Attack middleware for API rate limiting
     config.middleware.use Rack::Attack
