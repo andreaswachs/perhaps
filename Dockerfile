@@ -1,8 +1,8 @@
 # syntax = docker/dockerfile:1
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
-ARG RUBY_VERSION=3.4.4
-FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim AS base
+ARG RUBY_VERSION=3.4.7
+FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim-trixie AS base
 
 # Rails app lives here
 WORKDIR /rails
@@ -67,7 +67,8 @@ RUN rm -rf /rails/tmp/cache \
     find "${BUNDLE_PATH}"/ruby/*/gems -type d -name test -o -name spec -o -name docs -o -name doc -o -name examples -o -name sample | xargs rm -rf && \
     find "${BUNDLE_PATH}"/ruby/*/gems -type f \( -name '*.md' -o -name 'README*' -o -name 'CHANGELOG*' -o -name 'LICENSE*' -o -name 'COPYING*' \) -delete && \
     find "${BUNDLE_PATH}"/ruby/*/gems -type d -name ext | xargs rm -rf && \
-    rm -rf "${BUNDLE_PATH}"/ruby/*/gems/rdoc-*
+    rm -rf "${BUNDLE_PATH}"/ruby/*/gems/rdoc-* && \
+    rm -rf "${BUNDLE_PATH}"/ruby/*/gems/tailwindcss-ruby-*
 
 # Final stage for app image
 FROM base
