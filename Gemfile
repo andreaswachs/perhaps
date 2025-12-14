@@ -24,10 +24,6 @@ gem "stimulus-rails"
 gem "turbo-rails"
 gem "view_component"
 
-# https://github.com/lookbook-hq/lookbook/issues/712
-# TODO: Remove max version constraint when fixed
-gem "lookbook", "2.3.11"
-
 gem "hotwire_combobox"
 
 # Background Jobs
@@ -35,8 +31,6 @@ gem "sidekiq"
 gem "sidekiq-cron"
 
 # Monitoring
-gem "vernier"
-gem "rack-mini-profiler"
 gem "sentry-ruby"
 gem "sentry-rails"
 gem "sentry-sidekiq"
@@ -104,6 +98,11 @@ group :development do
   gem "stackprof"
   gem "derailed_benchmarks"
   gem "foreman"
+  gem "vernier"
+  gem "rack-mini-profiler"
+  # https://github.com/lookbook-hq/lookbook/issues/712
+  # TODO: Remove max version constraint when fixed
+  gem "lookbook", "2.3.11"
 end
 
 group :test do

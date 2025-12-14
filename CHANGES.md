@@ -3,6 +3,20 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-13
+- **Optimized Docker production image size from 927MB to 507MB (45.3% reduction)**
+  - First optimization: 927MB → 724MB (22% reduction) by excluding development/test gems
+  - Second optimization: 724MB → 643MB (11% reduction) by cleaning build artifacts before copying
+  - Third optimization: 643MB → 531MB (17% reduction) by removing tailwindcss-ruby gem after asset precompilation
+  - Fourth optimization: 531MB → 507MB (5% reduction) by switching from Debian Bookworm to Debian Trixie base image
+- Upgraded Ruby version from 3.4.4 to 3.4.7 and switched to Debian Trixie (testing) base image
+- Moved development-only gems (lookbook, rack-mini-profiler, vernier) to development group in Gemfile
+- Changed BUNDLE_WITHOUT from "development" to "development:test" to exclude test gems (selenium-webdriver, capybara, etc.)
+- Added conditional loading for lookbook configuration and routes to prevent production errors
+- Enhanced .dockerignore to exclude test files, documentation, and development tools from Docker build context
+- Implemented pre-copy cleanup in build stage to remove gem documentation, build artifacts (ext/ dirs), and rdoc gem
+- Removed tailwindcss-ruby gem (107MB) after asset precompilation as it's only needed during build
+- Removed unnecessary Rails files (compose files, Makefile, LICENSE, etc.) before final stage copy
+- Final bundle size: 146MB (down from 352MB = 59% reduction), final /rails size: 14MB (down from 76MB = 82% reduction)
 - Added Trufflehog secret scanning to CI workflow to detect committed credentials in PRs
 - Fixed CI system test failures: added PERHAPS_AI_ENABLED env for ChatsTest and wait for form submission in TradesTest
 - Fixed GoCardless provider tests by adding Content-Type headers to WebMock stubs for proper JSON parsing
