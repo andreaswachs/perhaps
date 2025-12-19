@@ -2,6 +2,12 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
+## 2025-12-19
+- Implemented FinancialSummary MCP tool for aggregate financial analytics including net worth, cash flow, and category/merchant spending analysis
+- Implemented ListTransactions MCP tool for listing transactions with date range and account filtering, pagination support
+- Implemented GetAccount MCP tool for retrieving detailed account information including balance history
+- MCP server now provides get_account tool with balance history summaries (30/90/365 day periods)
+
 ## 2025-12-13
 - **Optimized Docker production image size from 927MB to 507MB (45.3% reduction)**
   - First optimization: 927MB → 724MB (22% reduction) by excluding development/test gems

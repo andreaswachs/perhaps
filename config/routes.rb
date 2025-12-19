@@ -219,6 +219,9 @@ Rails.application.routes.draw do
         end
       end
 
+      # MCP (Model Context Protocol) endpoint
+      post "mcp", to: "mcp#handle"
+
       # Test routes for API controller testing (only available in test environment)
       if Rails.env.test?
         get "test", to: "test#index"
