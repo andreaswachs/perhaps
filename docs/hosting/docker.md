@@ -94,6 +94,56 @@ SECRET_KEY_BASE="replacemewiththegeneratedstringfromthepriorstep"
 POSTGRES_PASSWORD="replacemewithyourdesireddatabasepassword"
 ```
 
+### Step 3b (optional): Configure OpenID Connect (OIDC) for MCP
+
+If you plan to use the Perhaps MCP (Model Context Protocol) server with OAuth/OIDC authentication, you'll need to configure signing keys for ID tokens.
+
+#### Generate an RSA signing key
+
+OIDC requires an RSA private key to sign ID tokens (JWTs). Generate one using OpenSSL:
+
+```bash
+openssl genrsa -out openid_signing_key.pem 2048
+```
+
+#### Add the key to your environment
+
+You have two options for providing the signing key:
+
+**Option 1: Environment variable (recommended for production)**
+
+Convert the key to a single-line format and add it to your `.env` file:
+
+```bash
+# Convert to single line (handles newlines in env vars)
+OPENID_SIGNING_KEY=$(cat openid_signing_key.pem | tr '\n' '\\n')
+```
+
+Then add to your `.env`:
+
+```txt
+OPENID_SIGNING_KEY="<RSA-PRIVATE-KEY>"
+APP_HOST="your-domain.com"
+```
+
+**Option 2: File-based (alternative)**
+
+Mount the key file into your container and place it at `config/openid_key.pem`. The app will automatically use this file if `OPENID_SIGNING_KEY` is not set.
+
+#### Required environment variables for OIDC
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `OPENID_SIGNING_KEY` | Yes (production) | RSA private key in PEM format for signing ID tokens. In development, a key is auto-generated. |
+| `APP_HOST` | Yes (production) | Your domain name (e.g., `perhaps.example.com`). Used as the OIDC issuer URL (`https://APP_HOST`). |
+
+#### Security considerations
+
+- **Keep your signing key secure** - The RSA private key should never be committed to version control or shared publicly
+- **Use a unique key per environment** - Generate separate keys for staging and production
+- **Key rotation** - If you need to rotate keys, existing tokens will become invalid. Plan key rotation during maintenance windows
+- **Backup your key** - Store a secure backup of your signing key. If lost, all issued tokens become invalid
+
 ### Step 4: Run the app
 
 You are now ready to run the app. Start with the following command to make sure everything is working:

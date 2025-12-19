@@ -104,6 +104,8 @@ class Api::V1::BaseController < ApplicationController
     end
 
     # Check rate limits for API key authentication
+    # OAuth tokens are rate-limited at the infrastructure level (Rack::Attack)
+    # and do not use the ApiRateLimiter service
     def check_api_key_rate_limit
       return unless @authentication_method == :api_key && @rate_limiter
 
@@ -191,6 +193,58 @@ class Api::V1::BaseController < ApplicationController
         render_json({ error: "insufficient_scope", message: "This action requires the '#{required_scope}' scope" }, status: :forbidden)
         return false
       end
+      true
+    end
+
+    # Validate that OIDC scopes are present for authentication
+    # This ensures tokens include both authentication (OIDC) and authorization (data) scopes
+    def require_oidc_scopes!
+      return true unless @authentication_method == :oauth
+
+      scopes = current_scopes
+
+      # Check for required OIDC scope (openid is the base requirement)
+      unless scopes.include?("openid")
+        Rails.logger.warn "API Missing OIDC Scope: User #{current_resource_owner&.email} token missing 'openid' scope"
+        render_json({
+          error: "insufficient_scope",
+          message: "This endpoint requires OpenID Connect authentication. Token must include 'openid' scope.",
+          required_scopes: [ "openid", "profile", "email", "read" ],
+          current_scopes: scopes,
+          documentation: "#{request.base_url}/.well-known/openid-configuration"
+        }, status: :forbidden)
+        return false
+      end
+
+      true
+    end
+
+    # Validate comprehensive OIDC scope requirements
+    # Used for endpoints that need full OIDC profile information
+    def require_full_oidc_scopes!
+      return true unless @authentication_method == :oauth
+
+      scopes = current_scopes
+      missing_scopes = []
+
+      # Check for required OIDC scopes
+      missing_scopes << "openid" unless scopes.include?("openid")
+      missing_scopes << "profile" unless scopes.include?("profile")
+      missing_scopes << "email" unless scopes.include?("email")
+
+      if missing_scopes.any?
+        Rails.logger.warn "API Missing OIDC Scopes: User #{current_resource_owner&.email} token missing #{missing_scopes.join(', ')}"
+        render_json({
+          error: "insufficient_scope",
+          message: "This endpoint requires full OpenID Connect scopes for user identification.",
+          required_scopes: [ "openid", "profile", "email", "read" ],
+          missing_scopes: missing_scopes,
+          current_scopes: scopes,
+          documentation: "#{request.base_url}/.well-known/openid-configuration"
+        }, status: :forbidden)
+        return false
+      end
+
       true
     end
 

@@ -43,6 +43,15 @@ module Authentication
       session
     end
 
+    def redirect_to_after_login
+      # Check if there's a stored OAuth authorization URL to return to
+      if (oauth_return_url = session.delete(:oauth_return_to)).present?
+        redirect_to oauth_return_url, allow_other_host: false
+      else
+        redirect_to root_path
+      end
+    end
+
     def self_hosted_first_login?
       Rails.application.config.app_mode.self_hosted? && User.count.zero?
     end

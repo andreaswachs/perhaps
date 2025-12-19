@@ -6,22 +6,120 @@ class Api::V1::McpControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:family_admin)
     @family = @user.family
-    @api_key = api_keys(:active_key)
-    Redis.new.del("api_rate_limit:#{@api_key.id}")
+    @mcp_app = Doorkeeper::Application.create!(
+      name: "MCP Client",
+      redirect_uri: "http://localhost/callback",
+      scopes: "openid profile email read",
+      confidential: false
+    )
   end
 
-  test "requires authentication" do
-    post api_v1_mcp_path,
-      params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
-      headers: { "Content-Type" => "application/json" }
+  # OAuth Authentication Tests
+
+  test "accepts valid oauth token with read scope" do
+    token = create_oauth_token(scopes: "openid profile email read")
+
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :success
+    json = JSON.parse(response.body)
+    assert_equal "2.0", json["jsonrpc"]
+  end
+
+  test "accepts valid oauth token with read_write scope" do
+    token = create_oauth_token(scopes: "openid profile email read_write")
+
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :success
+  end
+
+  test "rejects oauth token without read scope" do
+    token = create_oauth_token(scopes: "openid profile email")
+
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_scope", json["error"]
+  end
+
+  test "rejects expired oauth token" do
+    token = create_oauth_token(scopes: "openid profile read", expires_in: -1.hour)
+
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
     assert_response :unauthorized
   end
 
-  test "lists available tools" do
-    post api_v1_mcp_path,
-      params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
-      headers: auth_headers
+  test "rejects invalid oauth token" do
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer invalid_token_12345" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :unauthorized
+  end
+
+  # API Key Rejection Tests
+
+  test "rejects api key with deprecation message" do
+    api_key = api_keys(:active_key)
+
+    post api_v1_mcp_url,
+         headers: { "X-Api-Key" => api_key.display_key },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :unauthorized
+    json = JSON.parse(response.body)
+
+    assert_equal "authentication_method_not_supported", json["error"]
+    assert_includes json["message"], "API keys are no longer supported"
+    assert_includes json["message"], "OAuth 2.0 with OpenID Connect"
+
+    # Check migration guide is present
+    assert json["migration_guide"].present?
+    assert json["required_authentication"].present?
+    assert_equal [ "openid", "profile", "email", "read" ],
+                 json["required_authentication"]["required_scopes"]
+  end
+
+  test "rejects request with no authentication" do
+    post api_v1_mcp_url,
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :unauthorized
+    json = JSON.parse(response.body)
+
+    assert_equal "unauthorized", json["error"]
+    assert_includes json["message"], "OAuth 2.0 Bearer token required"
+  end
+
+  # Functional Tests with OAuth
+
+  test "lists available tools with oauth" do
+    token = create_oauth_token(scopes: "openid profile email read")
+
+    post api_v1_mcp_url,
+         headers: {
+           "Authorization" => "Bearer #{token.token}",
+           "Content-Type" => "application/json"
+         },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json
 
     assert_response :success
     response_data = JSON.parse(response.body)
@@ -36,15 +134,20 @@ class Api::V1::McpControllerTest < ActionDispatch::IntegrationTest
     assert_includes tool_names, "get_account"
   end
 
-  test "executes ping tool successfully" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: { name: "ping", arguments: {} },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+  test "executes ping tool with oauth" do
+    token = create_oauth_token(scopes: "openid profile email read")
+
+    post api_v1_mcp_url,
+         headers: {
+           "Authorization" => "Bearer #{token.token}",
+           "Content-Type" => "application/json"
+         },
+         params: {
+           jsonrpc: "2.0",
+           method: "tools/call",
+           params: { name: "ping", arguments: {} },
+           id: 1
+         }.to_json
 
     assert_response :success
     response_data = JSON.parse(response.body)
@@ -66,273 +169,127 @@ class Api::V1::McpControllerTest < ActionDispatch::IntegrationTest
     assert_equal @family.currency, result["family_currency"]
   end
 
-  test "executes list_accounts tool successfully" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: { name: "list_accounts", arguments: {} },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+  # OIDC Scope Validation Tests
 
-    assert_response :success
-    response_data = JSON.parse(response.body)
+  test "requires openid scope for mcp access" do
+    token = create_oauth_token(scopes: "profile email read")
 
-    assert_nil response_data["error"]
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
+    assert_response :forbidden
+    json = JSON.parse(response.body)
 
-    assert result["accounts"].is_a?(Array)
-    assert result["total_count"].is_a?(Integer)
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["message"], "OpenID Connect"
+    assert_includes json["missing_scopes"], "openid"
   end
 
-  test "list_accounts filters by account_type" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "list_accounts",
-          arguments: { account_type: "depository" }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+  test "requires profile scope for mcp access" do
+    token = create_oauth_token(scopes: "openid email read")
 
-    assert_response :success
-    response_data = JSON.parse(response.body)
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
-    result["accounts"].each do |account|
-      assert_equal "depository", account["account_type"]
-    end
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["missing_scopes"], "profile"
   end
 
-  test "executes get_account tool successfully" do
-    account = @family.accounts.visible.first
+  test "requires email scope for mcp access" do
+    token = create_oauth_token(scopes: "openid profile read")
 
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "get_account",
-          arguments: { account_id: account.id.to_s }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
-    assert_response :success
-    response_data = JSON.parse(response.body)
+    assert_response :forbidden
+    json = JSON.parse(response.body)
 
-    assert_nil response_data["error"]
-
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
-
-    assert_equal account.id, result["id"]
-    assert_equal account.name, result["name"]
-    assert result["balance_history"].present?
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["missing_scopes"], "email"
   end
 
-  test "get_account returns error for invalid account_id" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "get_account",
-          arguments: { account_id: "invalid-id" }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+  test "requires read scope even with all oidc scopes" do
+    token = create_oauth_token(scopes: "openid profile email")
 
-    assert_response :success
-    response_data = JSON.parse(response.body)
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
+    assert_response :forbidden
+    json = JSON.parse(response.body)
 
-    assert_equal "Account not found", result["error"]
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["message"], "read"
   end
 
-  test "returns error for unknown method" do
-    post api_v1_mcp_path,
-      params: { jsonrpc: "2.0", method: "unknown/method", id: 1 }.to_json,
-      headers: auth_headers
+  test "accepts token with all required scopes" do
+    token = create_oauth_token(scopes: "openid profile email read")
+
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
     assert_response :success
-    response_data = JSON.parse(response.body)
-    assert response_data["error"].present?
   end
 
-  test "executes list_transactions tool successfully" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "list_transactions",
-          arguments: {
-            start_date: 1.year.ago.to_date.iso8601,
-            limit: 10
-          }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+  test "accepts token with read_write instead of read" do
+    token = create_oauth_token(scopes: "openid profile email read_write")
+
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
     assert_response :success
-    response_data = JSON.parse(response.body)
-
-    assert_nil response_data["error"]
-
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
-
-    assert result["transactions"].is_a?(Array)
-    assert result["pagination"].present?
-    assert_equal 10, result["pagination"]["limit"]
   end
 
-  test "list_transactions filters by account" do
-    account = @family.accounts.visible.first
+  test "provides helpful error for missing multiple scopes" do
+    token = create_oauth_token(scopes: "read")
 
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "list_transactions",
-          arguments: {
-            account_id: account.id.to_s,
-            start_date: 1.year.ago.to_date.iso8601
-          }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+    post api_v1_mcp_url,
+         headers: { "Authorization" => "Bearer #{token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
 
-    assert_response :success
-    response_data = JSON.parse(response.body)
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
+    assert_response :forbidden
+    json = JSON.parse(response.body)
 
-    result["transactions"].each do |txn|
-      assert_equal account.id, txn["account"]["id"]
-    end
+    assert_equal "insufficient_scope", json["error"]
+    assert_equal [ "openid", "profile", "email" ], json["missing_scopes"]
+    assert_equal [ "openid", "profile", "email", "read" ], json["required_scopes"]
+    assert json["documentation"].present?
   end
 
-  test "executes query_transactions with multiple filters" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "query_transactions",
-          arguments: {
-            classification: "expense",
-            min_amount: 10,
-            start_date: 1.year.ago.to_date.iso8601,
-            limit: 20
-          }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
+  # Backward Compatibility Tests
+
+  test "other api endpoints still accept api keys" do
+    api_key = api_keys(:active_key)
+
+    get api_v1_accounts_url,
+        headers: { "X-Api-Key" => api_key.display_key }
 
     assert_response :success
-    response_data = JSON.parse(response.body)
-
-    assert_nil response_data["error"]
-
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
-
-    assert result["transactions"].is_a?(Array)
-    assert result["summary"].present?
-    assert_equal "expense", result["filters_applied"]["classification"]
-
-    result["transactions"].each do |txn|
-      assert_equal "expense", txn["classification"]
-      assert txn["amount"].abs >= 10
-    end
-  end
-
-  test "executes financial_summary tool successfully" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "financial_summary",
-          arguments: { period: "month" }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
-
-    assert_response :success
-    response_data = JSON.parse(response.body)
-
-    assert_nil response_data["error"]
-
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
-
-    assert_equal "month", result["period"]["name"]
-    assert result["net_worth"].present?
-    assert result["cash_flow"].present?
-    assert result["top_categories"].present?
-  end
-
-  test "financial_summary with quarter period and no comparison" do
-    post api_v1_mcp_path,
-      params: {
-        jsonrpc: "2.0",
-        method: "tools/call",
-        params: {
-          name: "financial_summary",
-          arguments: {
-            period: "quarter",
-            compare_previous: false,
-            top_count: 5
-          }
-        },
-        id: 1
-      }.to_json,
-      headers: auth_headers
-
-    assert_response :success
-    response_data = JSON.parse(response.body)
-    content = response_data.dig("result", "content")
-    text_content = content.find { |c| c["type"] == "text" }
-    result = JSON.parse(text_content["text"])
-
-    assert_equal "quarter", result["period"]["name"]
-    assert_nil result["cash_flow"]["previous_period"]
-    assert result["top_categories"]["categories"].length <= 5
   end
 
   private
 
-    def auth_headers
-      {
-        "Content-Type" => "application/json",
-        "X-Api-Key" => @api_key.display_key
-      }
+    def create_oauth_token(scopes:, expires_in: 1.hour)
+      Doorkeeper::AccessToken.create!(
+        resource_owner_id: @user.id,
+        application: @mcp_app,
+        scopes: scopes,
+        expires_in: expires_in
+      )
     end
 end

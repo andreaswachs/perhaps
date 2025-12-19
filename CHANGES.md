@@ -2,6 +2,100 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
+## 2025-12-20 (Current)
+- **Added OIDC signing key documentation to Docker hosting guide**
+  - Documents how to generate and configure `OPENID_SIGNING_KEY` for production deployments
+  - Explains `APP_HOST` environment variable requirement for OIDC issuer URL
+  - Includes security considerations for key management, rotation, and backup
+- **Fixed TypeError in OIDC token generation (signing_key configuration)**
+  - The `signing_key` configuration in doorkeeper-openid_connect expects a string value, not a block
+  - Changed from `signing_key do ... end` to `signing_key(...)` to evaluate and pass the key string directly
+  - Added logic to persist generated development keys to `config/openid_key.pem`
+  - Added `config/openid_key.pem` to .gitignore
+- **Fixed OAuth flow not returning to client after login**
+  - OAuth authorization URL is now stored in session before redirecting to login
+  - After login, user is redirected back to OAuth authorization flow instead of dashboard
+  - Handles both regular login (SessionsController) and MFA verification (MfaController)
+  - Added `redirect_to_after_login` helper to Authentication concern for shared behavior
+- **Fixed DoubleRenderError when OAuth clients use prompt=consent (OIDC)**
+  - Created monkey-patch in `config/initializers/doorkeeper_openid_connect_patch.rb`
+  - The doorkeeper-openid_connect gem's `handle_oidc_prompt_param!` method calls `render :new` when `prompt=consent` is passed, but doesn't clear any existing response body first
+  - Patch clears `response_body` and `@_response_body` before rendering (same approach the gem uses in `handle_oidc_error!`)
+  - Also created custom `Oauth::AuthorizationsController` as additional safety check
+  - Updated routes.rb to use `controllers authorizations: "oauth/authorizations"`
+- **Fixed OIDC configuration error that prevented MCP OAuth token exchange**
+  - Added missing `auth_time_from_resource_owner` block to doorkeeper_openid_connect.rb initializer
+  - The OIDC spec requires this configuration for ID token generation; without it, `/oauth/token` would fail with `InvalidConfiguration` error
+  - Uses `resource_owner.created_at` as the auth_time claim value
+  - Fixed 2 MCP controller tests that were missing the required `email` scope
+  - All 17 MCP controller tests and 10 OAuth dynamic registration tests now pass
+- **Implemented OAuth 2.0 Dynamic Client Registration (RFC 7591) for MCP clients**
+  - Added `/oauth/register` endpoint for automatic OAuth application registration
+  - MCP clients like Claude Code can now self-register without manual OAuth setup
+  - Custom discovery endpoints include `registration_endpoint`:
+    - `/.well-known/openid-configuration` (OIDC Discovery)
+    - `/.well-known/oauth-authorization-server` (RFC 8414)
+  - Added `/.well-known/oauth-protected-resource` endpoint (RFC 9728) for protected resource metadata
+  - Supports RFC 7591 client metadata: redirect_uris, client_name, token_endpoint_auth_method, scope
+  - Public clients (token_endpoint_auth_method: "none") supported for mobile/CLI apps
+  - Default scopes for MCP clients: openid, profile, email, read
+  - Created comprehensive integration tests (10 tests covering registration, all discovery endpoints)
+  - All tests passing, rubocop clean
+
+## 2025-12-19
+- **Updated MCP Server documentation and migration guide (Task 06)**
+  - Completely updated docs/MCP_SERVER.md with comprehensive OAuth 2.0 + OIDC authentication guide
+  - Added step-by-step OIDC Authentication Flow section covering authorization, PKCE, token exchange, and refresh
+  - Created detailed Migration Guide from API keys to OAuth with common issues and testing tools
+  - Updated all curl examples to use Bearer tokens instead of API keys
+  - Enhanced troubleshooting section with OAuth-specific errors and solutions
+  - Updated security notes for OAuth token handling and storage best practices
+  - Created example Python OAuth client script (docs/examples/mcp_oauth_example.py) demonstrating complete flow
+- **Implemented OIDC Scope Validation for MCP endpoint (Task 05)**
+  - Added two new scope validation methods to BaseController: `require_oidc_scopes!` and `require_full_oidc_scopes!`
+  - MCP endpoint now validates that tokens include both OIDC scopes (openid, profile, email) AND data scopes (read/read_write)
+  - Comprehensive error responses indicate which scopes are missing and what's required
+  - Tokens with only OIDC scopes are rejected (even with valid authentication)
+  - Tokens with only data scopes are rejected (missing OpenID Connect identity verification)
+  - Error messages provide documentation links and clear guidance for scope configuration
+  - Added 11 new OIDC scope validation tests covering all scope combinations and error cases
+  - Rubocop clean with space formatting fixes
+  - See docs/MCP_SERVER.md for detailed scope requirements
+- **BREAKING CHANGE: MCP Endpoint Now Requires OAuth 2.0 + OIDC (Task 04)**
+  - MCP endpoint (`POST /api/v1/mcp`) now requires OAuth 2.0 Bearer token authentication
+  - API keys are no longer accepted for MCP access (other API endpoints unaffected)
+  - Helpful error messages guide users to OAuth 2.0 authorization flow with PKCE
+  - Required scopes: `openid profile email read`
+  - Deprecation error includes migration guide with step-by-step OAuth setup instructions
+  - OAuth endpoints: /oauth/authorize, /oauth/token, /oauth/userinfo, /.well-known/openid-configuration
+  - Updated BaseController comments to clarify OAuth rate limiting behavior
+  - Created comprehensive tests for OAuth-only authentication (10 tests covering OAuth acceptance, API key rejection, scope validation)
+  - All 1040 tests passing, rubocop clean
+  - See docs/MCP_SERVER.md for OAuth authentication guide
+- **Implemented MCP OAuth application configuration with OIDC scopes (Task 03)**
+  - Created dedicated "MCP Client" OAuth application for LLM clients (Claude Desktop, ChatGPT, etc.)
+  - Configured 4 redirect URIs: claude://oauth/callback, http://localhost:8080/callback, http://localhost:3000/oauth/callback, urn:ietf:wg:oauth:2.0:oob
+  - Scopes configured: openid, profile, email, read, read_write (OIDC + data access)
+  - Marked as public client (confidential: false) with PKCE enforcement
+  - Updated existing iOS OAuth app with new OIDC-compatible scopes (openid profile email read)
+  - Created comprehensive integration tests for MCP OAuth flow (5 tests covering app configuration, scopes, and token creation)
+  - All 1043 tests passing, no rubocop or erb_lint violations
+- **Implemented OIDC Discovery and UserInfo endpoints for MCP authentication (Task 02)**
+  - Added 8 OIDC claim methods to User model (oidc_sub, oidc_email, oidc_email_verified, oidc_name, oidc_given_name, oidc_family_name, oidc_family_id, oidc_role)
+  - Configured OIDC claims in doorkeeper_openid_connect initializer with scope-aware claim inclusion
+  - Profile scope includes name, given_name, family_name, family_id, role; email scope includes email, email_verified
+  - Added comprehensive unit tests for all OIDC claim methods (9 new tests)
+  - Added integration tests for UserInfo endpoint with scope validation (3 new tests)
+  - Updated docs/MCP_SERVER.md with OIDC endpoint documentation and usage examples
+  - All 1038 existing tests continue to pass, rubocop/erb_lint/brakeman all pass
+- **Implemented OpenID Connect (OIDC) foundation for MCP authentication (Task 01)**
+  - Added doorkeeper-openid_connect gem (v1.8.11) to enable OIDC authentication
+  - Created OIDC initializer configuration for ID token generation and claims
+  - Added OIDC scopes (openid, profile, email) to optional_scopes
+  - Discovery endpoint (/.well-known/openid-configuration) now functional
+  - All tests passing (1026 tests), no rubocop violations
+  - Lays groundwork for replacing API key authentication with OAuth 2.0 + OIDC on MCP endpoint
+
 ## 2025-12-19
 - **Made MCP server accessible via Docker Compose for local LLM integration**
   - Added development API key seed file that creates a test API key (`pk_dev_mcp_test_key_12345678901234567890123456789012`) for immediate MCP server access

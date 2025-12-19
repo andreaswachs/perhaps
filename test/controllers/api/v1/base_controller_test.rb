@@ -425,6 +425,129 @@ class Api::V1::BaseControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # OIDC Scope Validation Tests
+
+  test "require_oidc_scopes! allows token with openid scope" do
+    access_token = Doorkeeper::AccessToken.create!(
+      application: @oauth_app,
+      resource_owner_id: @user.id,
+      scopes: "openid read"
+    )
+
+    # This is a private method, so we test it indirectly by using a controller
+    # that calls it (MCP controller calls require_full_oidc_scopes!)
+    # For now, test through MCP endpoint
+    post "/api/v1/mcp",
+         headers: { "Authorization" => "Bearer #{access_token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    # Should fail due to missing profile and email scopes, but not openid
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["missing_scopes"], "profile"
+    assert_includes json["missing_scopes"], "email"
+    assert_not_includes json["missing_scopes"], "openid"
+  end
+
+  test "require_full_oidc_scopes! rejects token without openid scope" do
+    access_token = Doorkeeper::AccessToken.create!(
+      application: @oauth_app,
+      resource_owner_id: @user.id,
+      scopes: "profile email read"
+    )
+
+    post "/api/v1/mcp",
+         headers: { "Authorization" => "Bearer #{access_token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["missing_scopes"], "openid"
+  end
+
+  test "require_full_oidc_scopes! rejects token without profile scope" do
+    access_token = Doorkeeper::AccessToken.create!(
+      application: @oauth_app,
+      resource_owner_id: @user.id,
+      scopes: "openid email read"
+    )
+
+    post "/api/v1/mcp",
+         headers: { "Authorization" => "Bearer #{access_token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["missing_scopes"], "profile"
+  end
+
+  test "require_full_oidc_scopes! rejects token without email scope" do
+    access_token = Doorkeeper::AccessToken.create!(
+      application: @oauth_app,
+      resource_owner_id: @user.id,
+      scopes: "openid profile read"
+    )
+
+    post "/api/v1/mcp",
+         headers: { "Authorization" => "Bearer #{access_token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_scope", json["error"]
+    assert_includes json["missing_scopes"], "email"
+  end
+
+  test "require_full_oidc_scopes! accepts token with all required scopes" do
+    access_token = Doorkeeper::AccessToken.create!(
+      application: @oauth_app,
+      resource_owner_id: @user.id,
+      scopes: "openid profile email read"
+    )
+
+    post "/api/v1/mcp",
+         headers: { "Authorization" => "Bearer #{access_token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :success
+  end
+
+  test "require_full_oidc_scopes! returns helpful error with missing scopes list" do
+    access_token = Doorkeeper::AccessToken.create!(
+      application: @oauth_app,
+      resource_owner_id: @user.id,
+      scopes: "read"
+    )
+
+    post "/api/v1/mcp",
+         headers: { "Authorization" => "Bearer #{access_token.token}" },
+         params: { jsonrpc: "2.0", method: "tools/list", id: 1 }.to_json,
+         as: :json
+
+    assert_response :forbidden
+    json = JSON.parse(response.body)
+    assert_equal "insufficient_scope", json["error"]
+    assert_equal [ "openid", "profile", "email" ], json["missing_scopes"]
+    assert_equal [ "openid", "profile", "email", "read" ], json["required_scopes"]
+    assert_includes json["message"], "OpenID Connect"
+  end
+
+  test "require_full_oidc_scopes! skips validation for api key auth" do
+    # API keys should not be subject to OIDC scope validation
+    # (since they're being rejected by MCP controller before this point)
+    # This test verifies the method correctly skips for non-OAuth auth
+    get "/api/v1/test", headers: { "X-Api-Key" => @plain_api_key }
+    assert_response :success
+  end
+
 private
 
   def capture_log(&block)

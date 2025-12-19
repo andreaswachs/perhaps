@@ -49,6 +49,7 @@ gem "jbuilder"
 
 # OAuth & API Security
 gem "doorkeeper"
+gem "doorkeeper-openid_connect"
 gem "rack-attack", "~> 6.6"
 gem "faraday"
 gem "faraday-retry"
