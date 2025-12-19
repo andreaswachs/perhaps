@@ -3,6 +3,19 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-19
+- **Made MCP server accessible via Docker Compose for local LLM integration**
+  - Added development API key seed file that creates a test API key (`pk_dev_mcp_test_key_12345678901234567890123456789012`) for immediate MCP server access
+  - Configured Active Record encryption keys for development environment to support encrypted API key storage
+  - Created comprehensive MCP Server Usage Guide (docs/MCP_SERVER.md) with Docker Compose setup instructions, authentication, and usage examples
+  - MCP server endpoint (`POST /api/v1/mcp`) now fully functional with demo data in Docker containers
+  - Documented all 6 MCP tools: ping, list_accounts, get_account, list_transactions, query_transactions, financial_summary
+  - Fixed Sync model callback error when destroying records during data cleaning (added guard for destroyed records)
+- Enhanced demo seed data with comprehensive merchant, tag, and transaction notes for robust MCP server testing
+  - Added 32 merchant records (grocery stores, restaurants, gas stations, utilities, entertainment, etc.)
+  - Added 10 tag types (business, personal, tax deductible, reimbursable, subscription, recurring, vacation, etc.)
+  - Enhanced ~1,500+ transactions with merchant associations for query_transactions merchant filtering
+  - Enhanced ~2,300+ transactions with tag associations for query_transactions tag filtering
+  - Added contextual notes to ~100+ transaction entries for richer financial context
 - Implemented FinancialSummary MCP tool for aggregate financial analytics including net worth, cash flow, and category/merchant spending analysis
 - Implemented ListTransactions MCP tool for listing transactions with date range and account filtering, pagination support
 - Implemented GetAccount MCP tool for retrieving detailed account information including balance history
