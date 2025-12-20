@@ -64,9 +64,8 @@ RUN rm -rf /rails/tmp/cache \
     /rails/LICENSE \
     /rails/Procfile.dev \
     /rails/package-lock.json && \
-    find "${BUNDLE_PATH}"/ruby/*/gems -type d -name test -o -name spec -o -name docs -o -name doc -o -name examples -o -name sample | xargs rm -rf && \
+    find "${BUNDLE_PATH}"/ruby/*/gems -maxdepth 2 -type d \( -name test -o -name spec -o -name docs -o -name doc -o -name examples -o -name sample \) | xargs rm -rf && \
     find "${BUNDLE_PATH}"/ruby/*/gems -type f \( -name '*.md' -o -name 'README*' -o -name 'CHANGELOG*' -o -name 'LICENSE*' -o -name 'COPYING*' \) -delete && \
-    find "${BUNDLE_PATH}"/ruby/*/gems -type d -name ext | xargs rm -rf && \
     rm -rf "${BUNDLE_PATH}"/ruby/*/gems/rdoc-* && \
     rm -rf "${BUNDLE_PATH}"/ruby/*/gems/tailwindcss-ruby-*
 

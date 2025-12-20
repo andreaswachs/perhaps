@@ -12,11 +12,12 @@ gem "redis", "~> 5.4"
 # Deployment
 gem "puma", ">= 5.0"
 gem "bootsnap", require: false
+gem "webrick", "~> 1.8", require: false
 
 # Assets
 gem "importmap-rails"
 gem "propshaft"
-gem "tailwindcss-rails"
+gem "tailwindcss-rails", require: false
 gem "lucide-rails", github: "andreaswachs/lucide-rails"
 
 # Hotwire + UI

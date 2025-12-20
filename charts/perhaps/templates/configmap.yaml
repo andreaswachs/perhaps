@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "perhaps.fullname" . }}
+  labels:
+    {{- include "perhaps.labels" . | nindent 4 }}
+data:
+  RAILS_ENV: {{ .Values.config.railsEnv | quote }}
+  SELF_HOSTED: {{ .Values.config.selfHosted | quote }}
+  RAILS_FORCE_SSL: {{ .Values.config.forceSSL | quote }}
+  RAILS_ASSUME_SSL: {{ .Values.config.assumeSSL | quote }}
+  {{- if .Values.config.appHost }}
+  APP_HOST: {{ .Values.config.appHost | quote }}
+  {{- end }}
+  {{- if .Values.database.host }}
+  DB_HOST: {{ .Values.database.host | quote }}
+  DB_PORT: {{ .Values.database.port | quote }}
+  POSTGRES_DB: {{ .Values.database.name | quote }}
+  POSTGRES_USER: {{ .Values.database.username | quote }}
+  {{- end }}
+  {{- if .Values.redis.url }}
+  REDIS_URL: {{ .Values.redis.url | quote }}
+  {{- end }}
+  {{- if .Values.redis.cacheUrl }}
+  CACHE_REDIS_URL: {{ .Values.redis.cacheUrl | quote }}
+  {{- end }}
+  {{- range $key, $value := .Values.config.extraConfig }}
+  {{ $key }}: {{ $value | quote }}
+  {{- end }}

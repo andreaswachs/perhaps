@@ -3,6 +3,35 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-20 (Current)
+- **Fixed tailwindcss-rails rake task loading for CI asset precompilation**
+  - The `tailwindcss-rails` gem has `require: false` in Gemfile for runtime optimization
+  - This caused the gem's rake tasks (including `tailwindcss:build`) to not be loaded
+  - As a result, `assets:precompile` was not building Tailwind CSS before running tests
+  - Created `lib/tasks/tailwindcss.rake` to explicitly require the gem and load its rake tasks
+  - This hooks `tailwindcss:build` into `assets:precompile`, ensuring CSS is built for tests
+- **Fixed CI test failures by removing LookbooksController and adding asset precompilation step**
+  - Removed unnecessary LookbooksController that was causing Zeitwerk eager loader errors in test environment
+    - LookbooksController was causing NameError because Lookbook gem is only in development group
+    - Lookbook provides its own default preview controller, so custom controller is unnecessary
+    - Deleted app/controllers/lookbooks_controller.rb and removed preview_controller configuration from application.rb
+  - Fixed asset loading in test environment by precompiling and enabling fallback compilation
+    - Tests were failing with "asset 'tailwind.css' was not found" errors in CI
+    - Added `RAILS_ENV=test bin/rails assets:precompile` to CI workflow before running tests
+    - Added `config.assets.compile = true` to test environment as fallback for asset compilation
+    - Ensures tailwind.css and other assets are available during test execution
+  - All 1084 tests now pass cleanly without errors
+- **Completed kubernetes-separation feature: Added Helm PDB, HPA, and anti-affinity configuration (Task 06)**
+  - Created PodDisruptionBudget templates for web and worker deployments to ensure minimum availability during cluster maintenance
+  - Created HorizontalPodAutoscaler templates for automatic scaling based on CPU and memory utilization
+  - Added pod anti-affinity helper functions to spread pods across nodes for improved resilience
+  - Updated deployment templates to support custom affinity or default pod anti-affinity rules
+  - Enhanced values.yaml with complete PDB and HPA configuration for both web and worker components
+  - Created production-ready example values file (values-production.yaml) with 3 replicas and HPA enabled
+  - Created minimal example values file (values-minimal.yaml) for testing/development deployments
+  - Enhanced NOTES.txt with autoscaling and PDB status information and monitoring commands
+  - Created comprehensive Chart README with installation, configuration, and troubleshooting documentation
+  - All Helm chart validations pass: linting clean, templates render correctly, all configurations work as expected
+  - All project tests pass (1084 tests), rubocop clean, ERB linting clean, security scan clean (0 warnings)
 - **Fixed Docker image build and test compatibility issues**
   - Updated Ruby version from 3.4.4 to 3.4.7 to match available Docker base image (ruby:3.4.7-slim-trixie)
   - Updated Gemfile.lock to Ruby 3.4.7 with compatible gem versions

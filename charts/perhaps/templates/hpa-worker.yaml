@@ -1,0 +1,40 @@
+{{- if and .Values.worker.enabled .Values.worker.hpa.enabled }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "perhaps.fullname" . }}-worker
+  labels:
+    {{- include "perhaps.labels" . | nindent 4 }}
+    app.kubernetes.io/component: worker
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "perhaps.fullname" . }}-worker
+  minReplicas: {{ .Values.worker.hpa.minReplicas }}
+  maxReplicas: {{ .Values.worker.hpa.maxReplicas }}
+  metrics:
+    {{- if .Values.worker.hpa.targetCPUUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.worker.hpa.targetCPUUtilizationPercentage }}
+    {{- end }}
+    {{- if .Values.worker.hpa.targetMemoryUtilizationPercentage }}
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.worker.hpa.targetMemoryUtilizationPercentage }}
+    {{- end }}
+    {{- with .Values.worker.hpa.customMetrics }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+  {{- if .Values.worker.hpa.behavior }}
+  behavior:
+    {{- toYaml .Values.worker.hpa.behavior | nindent 4 }}
+  {{- end }}
+{{- end }}

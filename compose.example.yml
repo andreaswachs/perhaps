@@ -60,6 +60,9 @@ services:
     restart: unless-stopped
     environment:
       <<: *rails_env
+      PERHAPS_RUNTIME_MODE: web
+      PERHAPS_RUN_MIGRATIONS: "true"
+      PERHAPS_IS_LEADER: "true"
     depends_on:
       db:
         condition: service_healthy
@@ -76,13 +79,16 @@ services:
       context: .
       dockerfile: Dockerfile
     image: perhaps:local
-    command: bundle exec sidekiq
+    command: []
     restart: unless-stopped
     depends_on:
+      db:
+        condition: service_healthy
       redis:
         condition: service_healthy
     environment:
       <<: *rails_env
+      PERHAPS_RUNTIME_MODE: worker
     networks:
       - perhaps_net
 

@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Helper script to determine and report runtime mode
+# Used by docker-entrypoint and health checks
+
+set -e
+
+MODE="${PERHAPS_RUNTIME_MODE:-web}"
+
+case "$MODE" in
+  web)
+    echo "web"
+    ;;
+  worker)
+    echo "worker"
+    ;;
+  all)
+    echo "all"
+    ;;
+  *)
+    echo "Invalid PERHAPS_RUNTIME_MODE: $MODE" >&2
+    echo "Valid values: web, worker, all" >&2
+    exit 1
+    ;;
+esac

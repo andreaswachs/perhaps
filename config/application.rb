@@ -40,7 +40,6 @@ module Perhaps
     end
 
     if Rails.env.development?
-      config.view_component.preview_controller = "LookbooksController"
       config.lookbook.preview_display_options = {
         theme: [ "light", "dark" ] # available in view as params[:theme]
       }
@@ -48,5 +47,19 @@ module Perhaps
 
     # Enable Rack::Attack middleware for API rate limiting
     config.middleware.use Rack::Attack
+
+    # Runtime mode helpers for Kubernetes deployments
+    # These are loaded early, before initializers, so we read directly from ENV
+    def self.runtime_mode
+      ENV.fetch("PERHAPS_RUNTIME_MODE", "web").downcase.strip
+    end
+
+    def self.web_mode?
+      %w[web all].include?(runtime_mode)
+    end
+
+    def self.worker_mode?
+      %w[worker all].include?(runtime_mode)
+    end
   end
 end

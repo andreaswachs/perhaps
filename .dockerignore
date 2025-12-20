@@ -59,6 +59,10 @@
 /.idea
 /.devcontainer
 
+# Ignore development-only files
+/app/controllers/lookbooks_controller.rb
+/app/views/layouts/lookbooks.html.erb
+
 # Ignore other unnecessary files
 *.md
 !README.md
