@@ -91,4 +91,9 @@ Rails.application.configure do
 
   # Allow connection from any host in development
   config.hosts = nil
+
+  # Configure Active Record encryption for development (simple keys for local testing)
+  config.active_record.encryption.primary_key = "development_primary_key"
+  config.active_record.encryption.deterministic_key = "development_deterministic_key"
+  config.active_record.encryption.key_derivation_salt = "development_key_derivation_salt"
 end

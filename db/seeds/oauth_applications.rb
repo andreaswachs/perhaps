@@ -4,7 +4,8 @@
 # Perhaps iOS App
 ios_app = Doorkeeper::Application.find_or_create_by(name: "Perhaps iOS") do |app|
   app.redirect_uri = "perhaps://oauth/callback"
-  app.scopes = "read_accounts read_transactions read_balances"
+  # Use new OIDC scopes + data scopes
+  app.scopes = "openid profile email read"
   app.confidential = false # Public client (mobile app)
 end
 

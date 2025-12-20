@@ -2,7 +2,27 @@ require "sidekiq/web"
 require "sidekiq/cron/web"
 
 Rails.application.routes.draw do
-  use_doorkeeper
+  # Custom OAuth/OIDC Discovery endpoints with registration_endpoint (RFC 7591)
+  # Must be defined BEFORE use_doorkeeper_openid_connect to take precedence
+  get ".well-known/openid-configuration", to: "oauth/discovery#show"
+  get ".well-known/oauth-authorization-server", to: "oauth/discovery#show"
+
+  # OAuth Protected Resource Metadata (RFC 9728) - tells clients where the auth server is
+  get ".well-known/oauth-protected-resource", to: "oauth/discovery#protected_resource"
+  get ".well-known/oauth-protected-resource/*path", to: "oauth/discovery#protected_resource"
+
+  # OAuth 2.0 Dynamic Client Registration (RFC 7591)
+  # This endpoint allows MCP clients to register automatically
+  namespace :oauth do
+    resource :register, only: :create, controller: "dynamic_registration"
+  end
+
+  use_doorkeeper_openid_connect
+  use_doorkeeper do
+    # Use custom authorizations controller to fix DoubleRenderError
+    # when doorkeeper-openid_connect handles prompt=consent
+    controllers authorizations: "oauth/authorizations"
+  end
   # MFA routes
   resource :mfa, controller: "mfa", only: [ :new, :create ] do
     get :verify
@@ -218,6 +238,9 @@ Rails.application.routes.draw do
           post :retry, on: :collection
         end
       end
+
+      # MCP (Model Context Protocol) endpoint
+      post "mcp", to: "mcp#handle"
 
       # Test routes for API controller testing (only available in test environment)
       if Rails.env.test?

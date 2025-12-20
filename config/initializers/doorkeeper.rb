@@ -16,9 +16,13 @@ Doorkeeper.configure do
         # Return the authenticated user object as the resource owner.
         session_record.user
       else
+        # Store the full OAuth authorization URL so we can return after login
+        session[:oauth_return_to] = request.fullpath
         redirect_to new_session_url
       end
     else
+      # Store the full OAuth authorization URL so we can return after login
+      session[:oauth_return_to] = request.fullpath
       redirect_to new_session_url
     end
   end
@@ -262,7 +266,7 @@ Doorkeeper.configure do
   # https://doorkeeper.gitbook.io/guides/ruby-on-rails/scopes
   #
   default_scopes  :read
-  optional_scopes :read_write
+  optional_scopes :read_write, :openid, :profile, :email, :offline_access
 
   # Allows to restrict only certain scopes for grant_type.
   # By default, all the scopes will be available for all the grant types.

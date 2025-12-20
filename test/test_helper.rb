@@ -18,7 +18,6 @@ ENV["PLAID_SECRET"] ||= "test_secret"
 ENV["PGGSSENCMODE"] = "disable"
 
 require "rails/test_help"
-require "minitest/mock"
 require "minitest/autorun"
 require "mocha/minitest"
 require "aasm/minitest"

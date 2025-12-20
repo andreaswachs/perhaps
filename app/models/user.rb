@@ -163,6 +163,51 @@ class User < ApplicationRecord
     !onboarded?
   end
 
+  # OIDC Claims for OpenID Connect token introspection
+  # These methods provide standardized user information to OIDC clients
+
+  # Standard OIDC 'sub' (subject) claim - unique identifier for the user
+  def oidc_sub
+    id.to_s
+  end
+
+  # Standard OIDC 'email' claim
+  def oidc_email
+    email
+  end
+
+  # Standard OIDC 'email_verified' claim
+  def oidc_email_verified
+    # Email is verified if there's no pending email change
+    !pending_email_change?
+  end
+
+  # Standard OIDC 'name' claim - full display name
+  def oidc_name
+    display_name
+  end
+
+  # Standard OIDC 'given_name' claim
+  def oidc_given_name
+    first_name
+  end
+
+  # Standard OIDC 'family_name' claim
+  def oidc_family_name
+    last_name
+  end
+
+  # Custom claim: family_id for multi-tenancy
+  # This allows MCP clients to scope data access to the correct family
+  def oidc_family_id
+    family_id
+  end
+
+  # Custom claim: user role within the family
+  def oidc_role
+    role
+  end
+
   private
     def ensure_valid_profile_image
       return unless profile_image.attached?

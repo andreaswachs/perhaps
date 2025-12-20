@@ -138,4 +138,45 @@ class UserTest < ActiveSupport::TestCase
     assert_match %r{secret=#{user.otp_secret}}, user.provisioning_uri
     assert_match %r{issuer=Perhaps}, user.provisioning_uri
   end
+
+  # OIDC Claims Tests
+  test "oidc_sub returns user id as string" do
+    assert_equal users(:family_admin).id.to_s, users(:family_admin).oidc_sub
+  end
+
+  test "oidc_email returns user email" do
+    assert_equal users(:family_admin).email, users(:family_admin).oidc_email
+  end
+
+  test "oidc_email_verified returns true when no pending email change" do
+    user = users(:family_admin)
+    user.update(unconfirmed_email: nil)
+    assert_equal true, user.oidc_email_verified
+  end
+
+  test "oidc_email_verified returns false when pending email change" do
+    user = users(:family_admin)
+    user.update(unconfirmed_email: "new@example.com")
+    assert_equal false, user.oidc_email_verified
+  end
+
+  test "oidc_name returns display name" do
+    assert_equal users(:family_admin).display_name, users(:family_admin).oidc_name
+  end
+
+  test "oidc_given_name returns first name" do
+    assert_equal users(:family_admin).first_name, users(:family_admin).oidc_given_name
+  end
+
+  test "oidc_family_name returns last name" do
+    assert_equal users(:family_admin).last_name, users(:family_admin).oidc_family_name
+  end
+
+  test "oidc_family_id returns family id" do
+    assert_equal users(:family_admin).family_id, users(:family_admin).oidc_family_id
+  end
+
+  test "oidc_role returns user role" do
+    assert_equal users(:family_admin).role, users(:family_admin).oidc_role
+  end
 end

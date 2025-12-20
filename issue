@@ -1,0 +1,1040 @@
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>18</span>                                                                                                                                                                         │
+│ <span>19</span>                                                                                                                                                                         │
+│ <span>20</span>                                                                                                                                                                         │
+│ <span>21</span>                                                                                                                                                                         │
+│ <span>22</span>                                                                                                                                                                         │
+│ <span>23</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      begin                                                                                                                                                     │
+│ </div><div class="line active">        _, _, body = response = @app<span class="error_highlight">.call</span>(env)                                                                      │
+│ </div><div class="line">      rescue Exception                                                                                                                                          │
+│ </div><div class="line">        env[RACK_TEMPFILES]&amp;.each(&amp;:close!)                                                                                                             │
+│ </div><div class="line">        raise                                                                                                                                                   │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-51">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#29</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>27</span>                                                                                                                                                                         │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">    def call(env)                                                                                                                                               │
+│ </div><div class="line active">      status, headers, body = response = @app<span class="error_highlight">.call</span>(env)                                                             │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      if etag_status?(status) &amp;&amp; body.respond_to?(:to_ary) &amp;&amp; !skip_caching?(headers)                                                           │
+│ </div><div class="line">        body = body.to_ary                                                                                                                                      │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-52">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#44</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>42</span>                                                                                                                                                                         │
+│ <span>43</span>                                                                                                                                                                         │
+│ <span>44</span>                                                                                                                                                                         │
+│ <span>45</span>                                                                                                                                                                         │
+│ <span>46</span>                                                                                                                                                                         │
+│ <span>47</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">        response                                                                                                                                                      │
+│ </div><div class="line">      else                                                                                                                                                      │
+│ </div><div class="line active">        @app<span class="error_highlight">.call</span>(env)                                                                                              │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div><div class="line">    end                                                                                                                                                         │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-53">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#15</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>13</span>                                                                                                                                                                         │
+│ <span>14</span>                                                                                                                                                                         │
+│ <span>15</span>                                                                                                                                                                         │
+│ <span>16</span>                                                                                                                                                                         │
+│ <span>17</span>                                                                                                                                                                         │
+│ <span>18</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">    def call(env)                                                                                                                                               │
+│ </div><div class="line active">      _, _, body = response = @app<span class="error_highlight">.call</span>(env)                                                                        │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      if env[REQUEST_METHOD] == HEAD                                                                                                                            │
+│ </div><div class="line">        body.close if body.respond_to?(:close)                                                                                                                  │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-54">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#38</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>36</span>                                                                                                                                                                         │
+│ <span>37</span>                                                                                                                                                                         │
+│ <span>38</span>                                                                                                                                                                         │
+│ <span>39</span>                                                                                                                                                                         │
+│ <span>40</span>                                                                                                                                                                         │
+│ <span>41</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      def call(env)                                                                                                                                             │
+│ </div><div class="line active">        _, headers, _ = response = @app<span class="error_highlight">.call</span>(env)                                                                   │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        return response if policy_present?(headers)                                                                                                             │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-55">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#38</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>36</span>                                                                                                                                                                         │
+│ <span>37</span>                                                                                                                                                                         │
+│ <span>38</span>                                                                                                                                                                         │
+│ <span>39</span>                                                                                                                                                                         │
+│ <span>40</span>                                                                                                                                                                         │
+│ <span>41</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      def call(env)                                                                                                                                             │
+│ </div><div class="line active">        status, headers, _ = response = @app<span class="error_highlight">.call</span>(env)                                                              │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        # Returning CSP headers with a 304 Not Modified is harmful, since nonces in the                                                                         │
+│ </div><div class="line">        # new CSP headers might not match nonces in the cached HTML.                                                                                            │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-56">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#274</strong>):                                                                                                                           │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>272</span>                                                                                                                                                                        │
+│ <span>273</span>                                                                                                                                                                        │
+│ <span>274</span>                                                                                                                                                                        │
+│ <span>275</span>                                                                                                                                                                        │
+│ <span>276</span>                                                                                                                                                                        │
+│ <span>277</span>                                                                                                                                                                        │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">          req = make_request env                                                                                                                                      │
+│ </div><div class="line">          prepare_session(req)                                                                                                                                  │
+│ </div><div class="line active">          status, headers, body = app<span class="error_highlight">.call</span>(req.env)                                                                 │
+│ </div><div class="line">          res = Rack::Response::Raw.new status, headers                                                                                                         │
+│ </div><div class="line">          commit_session(req, res)                                                                                                                              │
+│ </div><div class="line">          [status, headers, body]                                                                                                                               │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-57">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#268</strong>):                                                                                                                           │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>266</span>                                                                                                                                                                        │
+│ <span>267</span>                                                                                                                                                                        │
+│ <span>268</span>                                                                                                                                                                        │
+│ <span>269</span>                                                                                                                                                                        │
+│ <span>270</span>                                                                                                                                                                        │
+│ <span>271</span>                                                                                                                                                                        │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">        def call(env)                                                                                                                                           │
+│ </div><div class="line active">          <span class="error_highlight">context</span>(env)                                                                                              │
+│ </div><div class="line">        end                                                                                                                                                     │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        def context(env, app = @app)                                                                                                                            │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-58">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#704</strong>):                                                                                                                           │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>702</span>                                                                                                                                                                        │
+│ <span>703</span>                                                                                                                                                                        │
+│ <span>704</span>                                                                                                                                                                        │
+│ <span>705</span>                                                                                                                                                                        │
+│ <span>706</span>                                                                                                                                                                        │
+│ <span>707</span>                                                                                                                                                                        │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">    def call(env)                                                                                                                                                     │
+│ </div><div class="line">      request = ActionDispatch::Request.new(env)                                                                                                                │
+│ </div><div class="line active">      response = @app<span class="error_highlight">.call</span>(env)                                                                                     │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      if request.have_cookie_jar?                                                                                                                               │
+│ </div><div class="line">        cookie_jar = request.cookie_jar                                                                                                                         │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-59">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#674</strong>):                                                                                                                           │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>672</span>                                                                                                                                                                        │
+│ <span>673</span>                                                                                                                                                                        │
+│ <span>674</span>                                                                                                                                                                        │
+│ <span>675</span>                                                                                                                                                                        │
+│ <span>676</span>                                                                                                                                                                        │
+│ <span>677</span>                                                                                                                                                                        │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">        end                                                                                                                                                           │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line active">        @app<span class="error_highlight">.call</span>(env)                                                                                              │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      private                                                                                                                                                   │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-60">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#31</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│ <span>33</span>                                                                                                                                                                         │
+│ <span>34</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      error = nil                                                                                                                                                     │
+│ </div><div class="line">      result = run_callbacks :call do                                                                                                                           │
+│ </div><div class="line active">        @app<span class="error_highlight">.call</span>(env)                                                                                              │
+│ </div><div class="line">      rescue =&gt; error                                                                                                                                        │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div><div class="line">      raise error if error                                                                                                                                      │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-61">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#101</strong>):                                                                                                                           │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>99</span>                                                                                                                                                                         │
+│ <span>100</span>                                                                                                                                                                        │
+│ <span>101</span>                                                                                                                                                                        │
+│ <span>102</span>                                                                                                                                                                        │
+│ <span>103</span>                                                                                                                                                                        │
+│ <span>104</span>                                                                                                                                                                        │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      if callbacks.empty?                                                                                                                                       │
+│ </div><div class="line active">        yield if block_given?                                                                                                                            │
+│ </div><div class="line">      else                                                                                                                                                      │
+│ </div><div class="line">        env = Filters::Environment.new(self, false, nil)                                                                                                        │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-62">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#30</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│ <span>33</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">    def call(env)                                                                                                                                                     │
+│ </div><div class="line">      error = nil                                                                                                                                               │
+│ </div><div class="line active">      result = <span class="error_highlight">run_callbacks</span> :call do                                                                               │
+│ </div><div class="line">        @app.call(env)                                                                                                                                          │
+│ </div><div class="line">      rescue =&gt; error                                                                                                                                        │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-63">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#16</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>14</span>                                                                                                                                                                         │
+│ <span>15</span>                                                                                                                                                                         │
+│ <span>16</span>                                                                                                                                                                         │
+│ <span>17</span>                                                                                                                                                                         │
+│ <span>18</span>                                                                                                                                                                         │
+│ <span>19</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      state = @executor.run!(reset: true)                                                                                                                             │
+│ </div><div class="line">      begin                                                                                                                                                     │
+│ </div><div class="line active">        response = @app<span class="error_highlight">.call</span>(env)                                                                                   │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        if env[&quot;action_dispatch.report_exception&quot;]                                                                                                    │
+│ </div><div class="line">          error = env[&quot;action_dispatch.exception&quot;]                                                                                                    │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-64">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#18</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>16</span>                                                                                                                                                                         │
+│ <span>17</span>                                                                                                                                                                         │
+│ <span>18</span>                                                                                                                                                                         │
+│ <span>19</span>                                                                                                                                                                         │
+│ <span>20</span>                                                                                                                                                                         │
+│ <span>21</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">    def call(env)                                                                                                                                                     │
+│ </div><div class="line">      request = ActionDispatch::Request.new(env)                                                                                                                │
+│ </div><div class="line active">      return @app<span class="error_highlight">.call</span>(env) unless actionable_request?(request)                                                     │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      ActiveSupport::ActionableError.dispatch(request.params[:error].to_s.safe_constantize, request.params[:action])                                            │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-65">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#11</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>9</span>                                                                                                                                                                          │
+│ <span>10</span>                                                                                                                                                                         │
+│ <span>11</span>                                                                                                                                                                         │
+│ <span>12</span>                                                                                                                                                                         │
+│ <span>13</span>                                                                                                                                                                         │
+│ <span>14</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      def call(env)                                                                                                                                             │
+│ </div><div class="line active">        return @app<span class="error_highlight">.call</span>(env) unless Sentry.initialized?                                                            │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        begin                                                                                                                                                   │
+│ </div><div class="line">          @app.call(env)                                                                                                                                        │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-66">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#31</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│ <span>33</span>                                                                                                                                                                         │
+│ <span>34</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">    def call(env)                                                                                                                                               │
+│ </div><div class="line active">      _, headers, body = response = @app<span class="error_highlight">.call</span>(env)                                                                  │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      if headers[Constants::X_CASCADE] == &quot;pass&quot;                                                                                                      │
+│ </div><div class="line">        body.close if body.respond_to?(:close)                                                                                                                  │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-67">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#132</strong>):                                                                                                                           │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>130</span>                                                                                                                                                                        │
+│ <span>131</span>                                                                                                                                                                        │
+│ <span>132</span>                                                                                                                                                                        │
+│ <span>133</span>                                                                                                                                                                        │
+│ <span>134</span>                                                                                                                                                                        │
+│ <span>135</span>                                                                                                                                                                        │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      def call_app(env)                                                                                                                                         │
+│ </div><div class="line active">        @app<span class="error_highlight">.call</span>(env)                                                                                              │
+│ </div><div class="line">      rescue =&gt; e                                                                                                                                            │
+│ </div><div class="line">        throw :app_exception, e                                                                                                                                 │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-68">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#28</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>26</span>                                                                                                                                                                         │
+│ <span>27</span>                                                                                                                                                                         │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line active">        status, headers, body = <span class="error_highlight">call_app</span>(env)                                                                       │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        if (session = Session.from(Thread.current)) &amp;&amp; acceptable_content_type?(headers)                                                                │
+│ </div><div class="line">          headers[&quot;x-web-console-session-id&quot;] = session.id                                                                                            │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-69">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#17</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>15</span>                                                                                                                                                                         │
+│ <span>16</span>                                                                                                                                                                         │
+│ <span>17</span>                                                                                                                                                                         │
+│ <span>18</span>                                                                                                                                                                         │
+│ <span>19</span>                                                                                                                                                                         │
+│ <span>20</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">    def call(env)                                                                                                                                               │
+│ </div><div class="line active">      app_exception = <span class="error_highlight">catch</span> :app_exception do                                                                       │
+│ </div><div class="line">        request = create_regular_or_whiny_request(env)                                                                                                          │
+│ </div><div class="line">        return call_app(env) unless request.permitted?                                                                                                          │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-70">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#17</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>15</span>                                                                                                                                                                         │
+│ <span>16</span>                                                                                                                                                                         │
+│ <span>17</span>                                                                                                                                                                         │
+│ <span>18</span>                                                                                                                                                                         │
+│ <span>19</span>                                                                                                                                                                         │
+│ <span>20</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">    def call(env)                                                                                                                                               │
+│ </div><div class="line active">      app_exception = <span class="error_highlight">catch</span> :app_exception do                                                                       │
+│ </div><div class="line">        request = create_regular_or_whiny_request(env)                                                                                                          │
+│ </div><div class="line">        return call_app(env) unless request.permitted?                                                                                                          │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-71">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#15</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>13</span>                                                                                                                                                                         │
+│ <span>14</span>                                                                                                                                                                         │
+│ <span>15</span>                                                                                                                                                                         │
+│ <span>16</span>                                                                                                                                                                         │
+│ <span>17</span>                                                                                                                                                                         │
+│ <span>18</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">      def call(env)                                                                                                                                             │
+│ </div><div class="line active">        return @app<span class="error_highlight">.call</span>(env) unless Sentry.initialized?                                                            │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">        # make sure the current thread has a clean hub                                                                                                          │
+│ </div><div class="line">        Sentry.clone_hub_to_current_thread                                                                                                                      │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-72">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#32</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│ <span>33</span>                                                                                                                                                                         │
+│ <span>34</span>                                                                                                                                                                         │
+│ <span>35</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">    def call(env)                                                                                                                                               │
+│ </div><div class="line active">      @app<span class="error_highlight">.call</span>(env)                                                                                                │
+│ </div><div class="line">    rescue Exception =&gt; exception                                                                                                                            │
+│ </div><div class="line">      request = ActionDispatch::Request.new env                                                                                                                 │
+│ </div><div class="line">      backtrace_cleaner = request.get_header(&quot;action_dispatch.backtrace_cleaner&quot;)                                                                     │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-73">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#41</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>39</span>                                                                                                                                                                         │
+│ <span>40</span>                                                                                                                                                                         │
+│ <span>41</span>                                                                                                                                                                         │
+│ <span>42</span>                                                                                                                                                                         │
+│ <span>43</span>                                                                                                                                                                         │
+│ <span>44</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">                                                                                                                                                                      │
+│ </div><div class="line">          logger.info { started_request_message(request) }                                                                                                      │
+│ </div><div class="line active">          status, headers, body = response = @app<span class="error_highlight">.call</span>(env)                                                         │
+│ </div><div class="line">          body = ::Rack::BodyProxy.new(body) { finish_request_instrumentation(handle, logger_tag_pop_count) }                                                   │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">          if response.frozen?                                                                                                                                   │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-74">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#29</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>27</span>                                                                                                                                                                         │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">        end                                                                                                                                                           │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line active">        <span class="error_highlight">call_app</span>(request, env)                                                                                      │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      private                                                                                                                                                   │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-75">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#11</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>9</span>                                                                                                                                                                          │
+│ <span>10</span>                                                                                                                                                                         │
+│ <span>11</span>                                                                                                                                                                         │
+│ <span>12</span>                                                                                                                                                                         │
+│ <span>13</span>                                                                                                                                                                         │
+│ <span>14</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      ::Rails.logger.silence { @app.call(env) }                                                                                                                       │
+│ </div><div class="line">    else                                                                                                                                                        │
+│ </div><div class="line active">      @app<span class="error_highlight">.call</span>(env)                                                                                                │
+│ </div><div class="line">    end                                                                                                                                                         │
+│ </div><div class="line">  end                                                                                                                                                           │
+│ </div><div class="line">end                                                                                                                                                             │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-76">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#96</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>94</span>                                                                                                                                                                         │
+│ <span>95</span>                                                                                                                                                                         │
+│ <span>96</span>                                                                                                                                                                         │
+│ <span>97</span>                                                                                                                                                                         │
+│ <span>98</span>                                                                                                                                                                         │
+│ <span>99</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      req = ActionDispatch::Request.new env                                                                                                                           │
+│ </div><div class="line">      req.remote_ip = GetIp.new(req, check_ip, proxies)                                                                                                         │
+│ </div><div class="line active">      @app<span class="error_highlight">.call</span>(req.env)                                                                                            │
+│ </div><div class="line">    end                                                                                                                                                         │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">    # The GetIp class exists as a way to defer processing of the request data into                                                                              │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-77">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#33</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│ <span>33</span>                                                                                                                                                                         │
+│ <span>34</span>                                                                                                                                                                         │
+│ <span>35</span>                                                                                                                                                                         │
+│ <span>36</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      req = ActionDispatch::Request.new env                                                                                                                           │
+│ </div><div class="line">      req.request_id = make_request_id(req.headers[@header])                                                                                                    │
+│ </div><div class="line active">      @app<span class="error_highlight">.call</span>(env).tap { |_status, headers, _body| headers[@header] = req.request_id }                            │
+│ </div><div class="line">    end                                                                                                                                                         │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">    private                                                                                                                                                     │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-78">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#28</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>26</span>                                                                                                                                                                         │
+│ <span>27</span>                                                                                                                                                                         │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      end                                                                                                                                                             │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line active">      @app<span class="error_highlight">.call</span>(env)                                                                                                │
+│ </div><div class="line">    end                                                                                                                                                         │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">    def method_override(env)                                                                                                                                    │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-79">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#24</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>22</span>                                                                                                                                                                         │
+│ <span>23</span>                                                                                                                                                                         │
+│ <span>24</span>                                                                                                                                                                         │
+│ <span>25</span>                                                                                                                                                                         │
+│ <span>26</span>                                                                                                                                                                         │
+│ <span>27</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">    def call(env)                                                                                                                                                     │
+│ </div><div class="line">      start_time = Utils.clock_time                                                                                                                             │
+│ </div><div class="line active">      _, headers, _ = response = @app<span class="error_highlight">.call</span>(env)                                                                     │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      request_time = Utils.clock_time - start_time                                                                                                              │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-80">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#29</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>27</span>                                                                                                                                                                         │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│ <span>30</span>                                                                                                                                                                         │
+│ <span>31</span>                                                                                                                                                                         │
+│ <span>32</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">          def call(env)                                                                                                                                               │
+│ </div><div class="line">            LocalCacheRegistry.set_cache_for(local_cache_key, LocalStore.new)                                                                                   │
+│ </div><div class="line active">            response = @app<span class="error_highlight">.call</span>(env)                                                                               │
+│ </div><div class="line">            response[2] = ::Rack::BodyProxy.new(response[2]) do                                                                                                 │
+│ </div><div class="line">              LocalCacheRegistry.set_cache_for(local_cache_key, nil)                                                                                            │
+│ </div><div class="line">            end                                                                                                                                                 │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-81">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#61</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>59</span>                                                                                                                                                                         │
+│ <span>60</span>                                                                                                                                                                         │
+│ <span>61</span>                                                                                                                                                                         │
+│ <span>62</span>                                                                                                                                                                         │
+│ <span>63</span>                                                                                                                                                                         │
+│ <span>64</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">      response = nil                                                                                                                                                  │
+│ </div><div class="line">      events = @subscriber.collect_events do                                                                                                                    │
+│ </div><div class="line active">        response = @app<span class="error_highlight">.call</span>(env)                                                                                   │
+│ </div><div class="line">      end                                                                                                                                                       │
+│ </div><div class="line">                                                                                                                                                                │
+│ </div><div class="line">      headers = response[1]                                                                                                                                     │
+│ </div>                                                                                                                                                                                  │
+│ </pre>                                                                                                                                                                                  │
+│ </td>                                                                                                                                                                                   │
+│           </tr>                                                                                                                                                                         │
+│         </table>                                                                                                                                                                        │
+│       </div>                                                                                                                                                                            │
+│     </div>                                                                                                                                                                              │
+│     <div class="source hidden" id="frame-source-0-82">                                                                                                                                  │
+│       <div class="info">                                                                                                                                                                │
+│         Extracted source (around line <strong>#26</strong>):                                                                                                                            │
+│       </div>                                                                                                                                                                            │
+│       <div class="data">                                                                                                                                                                │
+│         <table cellpadding="0" cellspacing="0" class="lines">                                                                                                                           │
+│           <tr>                                                                                                                                                                          │
+│             <td>                                                                                                                                                                        │
+│               <pre class="line_numbers">                                                                                                                                                │
+│ <span>24</span>                                                                                                                                                                         │
+│ <span>25</span>                                                                                                                                                                         │
+│ <span>26</span>                                                                                                                                                                         │
+│ <span>27</span>                                                                                                                                                                         │
+│ <span>28</span>                                                                                                                                                                         │
+│ <span>29</span>                                                                                                                                                                         │
+│               </pre>                                                                                                                                                                    │
+│             </td>                                                                                                                                                                       │
+│ <td width="100%">                                                                                                                                                                       │
+│ <pre>                                                                                                                                                                                   │
+│ <div class="line">        events = []                                                                                                                                                   │
+│ </div><div class="line">        ActiveSupport::IsolatedEx

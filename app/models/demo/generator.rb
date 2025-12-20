@@ -74,6 +74,7 @@ class Demo::Generator
 
       puts "📊 Creating realistic financial data..."
       create_realistic_categories!(family)
+      create_merchants_and_tags!(family)
       create_realistic_accounts!(family)
       create_realistic_transactions!(family)
       # Auto-fill current-month budget based on recent spending averages
@@ -185,6 +186,77 @@ class Demo::Generator
 
       # Interest expense bucket
       @interest_cat = family.categories.create!(name: "Loan Interest", color: "#475569", classification: "expense")
+    end
+
+    def create_merchants_and_tags!(family)
+      # Create merchants for common stores/services
+      @merchants = {
+        # Groceries
+        whole_foods: family.merchants.find_or_create_by!(name: "Whole Foods"),
+        trader_joes: family.merchants.find_or_create_by!(name: "Trader Joe's"),
+        safeway: family.merchants.find_or_create_by!(name: "Safeway"),
+        stop_shop: family.merchants.find_or_create_by!(name: "Stop & Shop"),
+        fresh_market: family.merchants.find_or_create_by!(name: "Fresh Market"),
+
+        # Restaurants
+        pizza_corner: family.merchants.find_or_create_by!(name: "Pizza Corner"),
+        sushi_place: family.merchants.find_or_create_by!(name: "Sushi Place"),
+        italian_kitchen: family.merchants.find_or_create_by!(name: "Italian Kitchen"),
+        mexican_grill: family.merchants.find_or_create_by!(name: "Mexican Grill"),
+        greek_taverna: family.merchants.find_or_create_by!(name: "Greek Taverna"),
+
+        # Coffee
+        local_coffee: family.merchants.find_or_create_by!(name: "Local Coffee"),
+        dunkin: family.merchants.find_or_create_by!(name: "Dunkin'"),
+        starbucks: family.merchants.find_or_create_by!(name: "Starbucks"),
+
+        # Gas stations
+        shell: family.merchants.find_or_create_by!(name: "Shell"),
+        exxon: family.merchants.find_or_create_by!(name: "Exxon"),
+        bp: family.merchants.find_or_create_by!(name: "BP"),
+        chevron: family.merchants.find_or_create_by!(name: "Chevron"),
+
+        # Utilities
+        coned: family.merchants.find_or_create_by!(name: "ConEd Electric"),
+        verizon: family.merchants.find_or_create_by!(name: "Verizon Internet"),
+
+        # Shopping
+        target: family.merchants.find_or_create_by!(name: "Target"),
+        walmart: family.merchants.find_or_create_by!(name: "Walmart"),
+        costco: family.merchants.find_or_create_by!(name: "Costco"),
+        amazon: family.merchants.find_or_create_by!(name: "Amazon"),
+
+        # Entertainment
+        netflix: family.merchants.find_or_create_by!(name: "Netflix"),
+        spotify: family.merchants.find_or_create_by!(name: "Spotify Premium"),
+        disney_plus: family.merchants.find_or_create_by!(name: "Disney+"),
+
+        # Travel
+        delta: family.merchants.find_or_create_by!(name: "Delta Airlines"),
+        hilton: family.merchants.find_or_create_by!(name: "Hilton Hotels"),
+        airbnb: family.merchants.find_or_create_by!(name: "AirBnB"),
+
+        # Healthcare
+        cvs: family.merchants.find_or_create_by!(name: "CVS Pharmacy"),
+        walgreens: family.merchants.find_or_create_by!(name: "Walgreens"),
+
+        # Gym
+        gym: family.merchants.find_or_create_by!(name: "Local Gym")
+      }
+
+      # Create tags for transaction organization
+      @tags = {
+        business: family.tags.create!(name: "Business", color: "#3b82f6"),
+        personal: family.tags.create!(name: "Personal", color: "#8b5cf6"),
+        tax_deductible: family.tags.create!(name: "Tax Deductible", color: "#10b981"),
+        reimbursable: family.tags.create!(name: "Reimbursable", color: "#f59e0b"),
+        subscription: family.tags.create!(name: "Subscription", color: "#ec4899"),
+        recurring: family.tags.create!(name: "Recurring", color: "#6366f1"),
+        one_time: family.tags.create!(name: "One-time", color: "#14b8a6"),
+        vacation: family.tags.create!(name: "Vacation", color: "#06b6d4"),
+        emergency: family.tags.create!(name: "Emergency", color: "#ef4444"),
+        gift: family.tags.create!(name: "Gift", color: "#f97316")
+      }
     end
 
     def create_realistic_accounts!(family)
@@ -407,17 +479,18 @@ class Demo::Generator
 
       # Monthly utilities (reduced frequency)
       utilities = [
-        { name: "ConEd Electric", range: 150..300 },
-        { name: "Verizon Internet", range: 85..105 },
-        { name: "Water & Sewer", range: 60..90 },
-        { name: "Gas Bill", range: 80..220 }
+        { name: "Electric Bill", range: 150..300, merchant: @merchants[:coned] },
+        { name: "Internet Service", range: 85..105, merchant: @merchants[:verizon] },
+        { name: "Water & Sewer", range: 60..90, merchant: nil },
+        { name: "Gas Bill", range: 80..220, merchant: nil }
       ]
 
       utilities.each do |utility|
         (start_date..Date.current).each do |date|
           next unless date.day.between?(5, 15) && rand < 0.9 # Monthly with higher frequency
           amount = rand(utility[:range])
-          create_transaction!(@chase_checking, amount, utility[:name], @utilities_cat, date)
+          create_transaction!(@chase_checking, amount, utility[:name], @utilities_cat, date,
+            merchant: utility[:merchant], tags: [ @tags[:recurring] ])
         end
       end
     end
@@ -427,24 +500,34 @@ class Demo::Generator
       120.times do  # Increased from 60
         date = weighted_random_date
         amount = rand(60..180) # Reduced max from 220
-        stores = [ "Whole Foods", "Trader Joe's", "Safeway", "Stop & Shop", "Fresh Market" ]
-        create_transaction!(@chase_checking, amount, "#{stores.sample} Market", @groceries_cat, date)
+        merchant = [ @merchants[:whole_foods], @merchants[:trader_joes], @merchants[:safeway], @merchants[:stop_shop], @merchants[:fresh_market] ].sample
+        tags = [ @tags[:recurring] ]
+        tags << @tags[:business] if rand < 0.1 # 10% business meals
+        notes = rand < 0.15 ? [ "Weekly groceries", "Stock up", "Party supplies", "Special dinner" ].sample : nil
+        create_transaction!(@chase_checking, amount, "Grocery Shopping", @groceries_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
 
       # Restaurant dining (increased volume)
       100.times do  # Increased from 50
         date = weighted_random_date
         amount = rand(25..65) # Reduced max from 80
-        restaurants = [ "Pizza Corner", "Sushi Place", "Italian Kitchen", "Mexican Grill", "Greek Taverna" ]
-        create_transaction!(@chase_checking, amount, restaurants.sample, @restaurants_cat, date)
+        merchant = [ @merchants[:pizza_corner], @merchants[:sushi_place], @merchants[:italian_kitchen], @merchants[:mexican_grill], @merchants[:greek_taverna] ].sample
+        tags = []
+        tags << @tags[:business] if rand < 0.2 # 20% business meals
+        tags << @tags[:reimbursable] if tags.include?(@tags[:business]) && rand < 0.5
+        notes = rand < 0.2 ? [ "Date night", "Team lunch", "Client dinner", "Birthday celebration" ].sample : nil
+        create_transaction!(@chase_checking, amount, "Restaurant", @restaurants_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
 
       # Coffee & takeout (increased volume)
       80.times do  # Increased from 40
         date = weighted_random_date
         amount = rand(8..20) # Reduced from 10-25
-        places = [ "Local Coffee", "Dunkin'", "Corner Deli", "Food Truck" ]
-        create_transaction!(@chase_checking, amount, places.sample, @coffee_cat, date)
+        merchant = [ @merchants[:local_coffee], @merchants[:dunkin], @merchants[:starbucks] ].sample
+        tags = [ @tags[:recurring] ]
+        tags << @tags[:business] if rand < 0.15
+        notes = rand < 0.1 ? [ "Morning coffee", "Meeting", "Quick bite" ].sample : nil
+        create_transaction!(@chase_checking, amount, "Coffee & Snacks", @coffee_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
     end
 
@@ -453,8 +536,12 @@ class Demo::Generator
       60.times do
         date = weighted_random_date
         amount = rand(35..75)
-        stations = [ "Shell", "Exxon", "BP", "Chevron", "Mobil", "Sunoco" ]
-        create_transaction!(@chase_checking, amount, "#{stations.sample} Gas", @gas_cat, date)
+        merchant = [ @merchants[:shell], @merchants[:exxon], @merchants[:bp], @merchants[:chevron] ].sample
+        tags = [ @tags[:recurring] ]
+        tags << @tags[:business] if rand < 0.25 # 25% business mileage
+        tags << @tags[:reimbursable] if tags.include?(@tags[:business]) && rand < 0.6
+        notes = rand < 0.1 ? [ "Road trip", "Commute", "Weekly fill-up" ].sample : nil
+        create_transaction!(@chase_checking, amount, "Gas Station", @gas_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
 
       # Car payment (monthly for 6 years)
@@ -463,24 +550,23 @@ class Demo::Generator
 
       (car_payment_start..car_payment_end).each do |date|
         next unless date.day == 15 # 15th of month
-        create_transaction!(@chase_checking, 385, "Auto Loan Payment", @car_payment_cat, date)
+        create_transaction!(@chase_checking, 385, "Auto Loan Payment", @car_payment_cat, date, tags: [ @tags[:recurring] ])
       end
     end
 
     def generate_entertainment_transactions!
       # Monthly subscriptions (increased timeframe)
       subscriptions = [
-        { name: "Netflix", amount: 15 },
-        { name: "Spotify Premium", amount: 12 },
-        { name: "Disney+", amount: 8 },
-        { name: "HBO Max", amount: 16 },
-        { name: "Amazon Prime", amount: 14 }
+        { name: "Netflix", amount: 15, merchant: @merchants[:netflix] },
+        { name: "Spotify Premium", amount: 12, merchant: @merchants[:spotify] },
+        { name: "Disney+", amount: 8, merchant: @merchants[:disney_plus] }
       ]
 
       subscriptions.each do |sub|
         (3.years.ago.to_date..Date.current).each do |date| # Reduced from 12 years
           next unless date.day == rand(1..28) && rand < 0.9 # Higher frequency for active subscriptions
-          create_transaction!(@chase_checking, sub[:amount], sub[:name], @entertainment_cat, date)
+          create_transaction!(@chase_checking, sub[:amount], sub[:name], @entertainment_cat, date,
+            merchant: sub[:merchant], tags: [ @tags[:subscription], @tags[:recurring] ])
         end
       end
 
@@ -489,7 +575,10 @@ class Demo::Generator
         date = weighted_random_date
         amount = rand(15..60) # Reduced from 20-80
         activities = [ "Movie Theater", "Sports Game", "Museum", "Comedy Club", "Bowling", "Mini Golf", "Arcade" ]
-        create_transaction!(@chase_checking, amount, activities.sample, @entertainment_cat, date)
+        tags = [ @tags[:one_time] ]
+        tags << @tags[:gift] if rand < 0.1 # 10% are gifts
+        notes = rand < 0.15 ? [ "Weekend fun", "Date night", "With friends", "Family outing" ].sample : nil
+        create_transaction!(@chase_checking, amount, activities.sample, @entertainment_cat, date, tags: tags, notes: notes)
       end
     end
 
@@ -498,16 +587,24 @@ class Demo::Generator
       80.times do  # Increased from 40
         date = weighted_random_date
         amount = rand(30..90) # Reduced max from 120
-        stores = [ "Target.com", "Walmart", "Costco" ]
-        create_transaction!(@chase_checking, amount, "#{stores.sample} Purchase", @shopping_cat, date)
+        merchant = [ @merchants[:target], @merchants[:walmart], @merchants[:amazon] ].sample
+        tags = []
+        tags << @tags[:gift] if rand < 0.15 # 15% are gifts
+        tags << @tags[:one_time] if tags.empty?
+        notes = rand < 0.1 ? [ "Holiday shopping", "Birthday gift", "Household items", "Back to school" ].sample : nil
+        create_transaction!(@chase_checking, amount, "Online Shopping", @shopping_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
 
       # In-store shopping (increased volume)
       60.times do  # Increased from 25
         date = weighted_random_date
         amount = rand(35..80) # Reduced max from 100
-        stores = [ "Target", "REI", "Barnes & Noble", "GameStop" ]
-        create_transaction!(@chase_checking, amount, stores.sample, @shopping_cat, date)
+        merchant = [ @merchants[:target], @merchants[:walmart], @merchants[:costco] ].sample
+        tags = []
+        tags << @tags[:gift] if rand < 0.12
+        tags << @tags[:one_time] if tags.empty?
+        notes = rand < 0.12 ? [ "Bulk purchase", "Weekly shop", "Supplies" ].sample : nil
+        create_transaction!(@chase_checking, amount, "In-Store Shopping", @shopping_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
     end
 
@@ -517,15 +614,23 @@ class Demo::Generator
         date = weighted_random_date
         amount = rand(150..350) # Reduced from 180-450
         providers = [ "Dr. Smith", "Dr. Johnson", "Dr. Williams", "Specialist Visit", "Urgent Care" ]
-        create_transaction!(@chase_checking, amount, providers.sample, @healthcare_cat, date)
+        tags = []
+        tags << @tags[:reimbursable] if rand < 0.3 # 30% reimbursable from FSA/HSA
+        tags << @tags[:emergency] if rand < 0.05 # 5% emergency visits
+        notes = rand < 0.15 ? [ "Annual checkup", "Follow-up", "Consultation", "Preventive care" ].sample : nil
+        create_transaction!(@chase_checking, amount, providers.sample, @healthcare_cat, date, tags: tags, notes: notes)
       end
 
       # Pharmacy (increased volume)
       80.times do  # Increased from 40
         date = weighted_random_date
         amount = rand(12..65) # Reduced from 15-85
-        pharmacies = [ "CVS Pharmacy", "Walgreens", "Rite Aid", "Local Pharmacy" ]
-        create_transaction!(@chase_checking, amount, pharmacies.sample, @healthcare_cat, date)
+        merchant = [ @merchants[:cvs], @merchants[:walgreens] ].sample
+        tags = []
+        tags << @tags[:reimbursable] if rand < 0.4 # 40% reimbursable prescriptions
+        tags << @tags[:recurring] if rand < 0.5 # 50% recurring prescriptions
+        notes = rand < 0.1 ? [ "Prescription refill", "Over-the-counter", "Medical supplies" ].sample : nil
+        create_transaction!(@chase_checking, amount, "Pharmacy", @healthcare_cat, date, merchant: merchant, tags: tags, notes: notes)
       end
     end
 
@@ -533,24 +638,28 @@ class Demo::Generator
       # Major vacations (reduced count - premium travel handled in credit card cycles)
       8.times do
         date = weighted_random_date
+        tags = [ @tags[:vacation], @tags[:one_time] ]
 
         # Smaller local trips from checking
         hotel_amount = rand(200..500)
-        hotels = [ "Local Hotel", "B&B", "Nearby Resort" ]
+        merchant = [ @merchants[:hilton], @merchants[:airbnb] ].sample
+        notes = [ "Summer vacation", "Weekend getaway", "Family trip", "Anniversary trip" ].sample
         if rand < 0.3 && date > 3.years.ago.to_date # Some EUR transactions
-          create_transaction!(@eu_checking, hotel_amount, hotels.sample, @travel_cat, date)
+          create_transaction!(@eu_checking, hotel_amount, "Hotel Stay", @travel_cat, date, merchant: merchant, tags: tags, notes: notes)
         else
-          create_transaction!(@chase_checking, hotel_amount, hotels.sample, @travel_cat, date)
+          create_transaction!(@chase_checking, hotel_amount, "Hotel Stay", @travel_cat, date, merchant: merchant, tags: tags, notes: notes)
         end
 
         # Domestic flights (smaller amounts)
         flight_amount = rand(200..400)
-        create_transaction!(@chase_checking, flight_amount, "Domestic Flight", @travel_cat, date + rand(1..5).days)
+        create_transaction!(@chase_checking, flight_amount, "Flight", @travel_cat, date + rand(1..5).days,
+          merchant: @merchants[:delta], tags: tags, notes: notes)
 
         # Local activities
         activity_amount = rand(50..150)
         activities = [ "Local Tour", "Museum Tickets", "Activity Pass" ]
-        create_transaction!(@chase_checking, activity_amount, activities.sample, @travel_cat, date + rand(1..7).days)
+        create_transaction!(@chase_checking, activity_amount, activities.sample, @travel_cat, date + rand(1..7).days,
+          tags: tags, notes: notes)
       end
     end
 
@@ -558,7 +667,8 @@ class Demo::Generator
       # Gym membership
       (12.years.ago.to_date..Date.current).each do |date|
         next unless date.day == 1 && rand < 0.8 # Monthly
-        create_transaction!(@chase_checking, 45, "Gym Membership", @personal_care_cat, date)
+        create_transaction!(@chase_checking, 45, "Gym Membership", @personal_care_cat, date,
+          merchant: @merchants[:gym], tags: [ @tags[:subscription], @tags[:recurring] ])
       end
 
       # Beauty/grooming (checking account only)
@@ -566,7 +676,9 @@ class Demo::Generator
         date = weighted_random_date
         amount = rand(25..80)
         services = [ "Hair Salon", "Barber Shop", "Nail Salon" ]
-        create_transaction!(@chase_checking, amount, services.sample, @personal_care_cat, date)
+        tags = [ @tags[:recurring] ]
+        notes = rand < 0.1 ? [ "Haircut", "Color treatment", "Manicure" ].sample : nil
+        create_transaction!(@chase_checking, amount, services.sample, @personal_care_cat, date, tags: tags, notes: notes)
       end
     end
 
@@ -853,17 +965,29 @@ class Demo::Generator
       [ @food_cat, @entertainment_cat, @shopping_cat, @travel_cat, @transportation_cat ].sample
     end
 
-    def create_transaction!(account, amount, name, category, date)
+    def create_transaction!(account, amount, name, category, date, merchant: nil, tags: [], notes: nil)
       # For credit cards (liabilities), positive amounts = charges (increase debt)
       # For checking accounts (assets), positive amounts = expenses (decrease balance)
       # The amount is already signed correctly by the caller
-      account.entries.create!(
-        entryable: Transaction.new(category: category),
+      transaction = Transaction.new(category: category, merchant: merchant)
+
+      entry = account.entries.create!(
+        entryable: transaction,
         amount: amount,
         name: name,
         currency: account.currency,
-        date: date
+        date: date,
+        notes: notes
       )
+
+      # Add tags if provided
+      if tags.any?
+        tags.each do |tag|
+          transaction.taggings.create!(tag: tag) if tag
+        end
+      end
+
+      entry
     end
 
     def create_investment_transaction!(account, security, qty, price, date, name)

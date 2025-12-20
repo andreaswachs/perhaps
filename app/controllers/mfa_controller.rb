@@ -32,7 +32,7 @@ class MfaController < ApplicationController
     if @user&.verify_otp?(params[:code])
       session.delete(:mfa_user_id)
       @session = create_session_for(@user)
-      redirect_to root_path
+      redirect_to_after_login
     else
       flash.now[:alert] = t(".invalid_code")
       render :verify, status: :unprocessable_entity

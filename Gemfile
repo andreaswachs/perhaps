@@ -49,13 +49,14 @@ gem "jbuilder"
 
 # OAuth & API Security
 gem "doorkeeper"
+gem "doorkeeper-openid_connect"
 gem "rack-attack", "~> 6.6"
 gem "faraday"
 gem "faraday-retry"
 gem "faraday-multipart"
 gem "inline_svg"
 gem "octokit"
-gem "pagy"
+gem "pagy", "~> 9.3.5"
 gem "rails-settings-cached"
 gem "tzinfo-data", platforms: %i[windows jruby]
 gem "csv"
@@ -74,6 +75,7 @@ gem "after_commit_everywhere", "~> 1.0"
 
 # AI
 gem "anthropic"
+gem "mcp"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows]
@@ -106,6 +108,7 @@ group :development do
 end
 
 group :test do
+  gem "minitest", "~> 5.25.5"
   gem "capybara"
   gem "selenium-webdriver"
   gem "mocha"

@@ -14,7 +14,7 @@ class SessionsController < ApplicationController
         redirect_to verify_mfa_path
       else
         @session = create_session_for(user)
-        redirect_to root_path
+        redirect_to_after_login
       end
     else
       flash.now[:alert] = t(".invalid_credentials")
