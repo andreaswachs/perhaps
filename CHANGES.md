@@ -8,10 +8,11 @@ This file documents modifications made to this fork of the original Maybe Financ
     - LookbooksController was causing NameError because Lookbook gem is only in development group
     - Lookbook provides its own default preview controller, so custom controller is unnecessary
     - Deleted app/controllers/lookbooks_controller.rb and removed preview_controller configuration from application.rb
-  - Added asset precompilation step to CI workflow before running tests
-    - Tests were failing with "asset 'tailwind.css' was not found" because assets weren't compiled
-    - Added `RAILS_ENV=test bin/rails assets:precompile` step in .github/workflows/ci.yml
-    - Must specify RAILS_ENV=test to ensure assets are precompiled for the test environment
+  - Configured test environment to compile assets on-the-fly instead of requiring precompilation
+    - Tests were failing with "asset 'tailwind.css' was not found" errors
+    - Added `config.assets.compile = true` to test environment configuration
+    - Rails now compiles CSS/JS assets during test execution automatically
+    - Removed unnecessary asset precompilation step from CI workflow
   - All 1084 tests now pass cleanly without errors
 - **Completed kubernetes-separation feature: Added Helm PDB, HPA, and anti-affinity configuration (Task 06)**
   - Created PodDisruptionBudget templates for web and worker deployments to ensure minimum availability during cluster maintenance
