@@ -133,6 +133,9 @@ jobs:
           bin/rails db:schema:load
           bin/rails db:seed
 
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+
       - name: Unit and integration tests
         run: bin/rails test
 
