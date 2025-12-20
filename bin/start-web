@@ -1,0 +1,4 @@
+#!/bin/bash
+# Convenience script to start in web mode
+export PERHAPS_RUNTIME_MODE=web
+exec /rails/bin/docker-entrypoint

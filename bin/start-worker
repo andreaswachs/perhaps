@@ -1,0 +1,4 @@
+#!/bin/bash
+# Convenience script to start in worker mode
+export PERHAPS_RUNTIME_MODE=worker
+exec /rails/bin/docker-entrypoint

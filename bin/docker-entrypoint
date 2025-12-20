@@ -1,8 +1,145 @@
-#!/bin/bash -e
+#!/bin/bash
+set -e
 
-# If running the rails server then create or migrate existing database
-if [ "${1}" == "./bin/rails" ] && [ "${2}" == "server" ]; then
-  ./bin/rails db:prepare
-fi
+# Runtime mode configuration
+# Valid values: web, worker, all (default: web)
+RUNTIME_MODE="${PERHAPS_RUNTIME_MODE:-web}"
 
-exec "${@}"
+# Database migration configuration
+# Set to "true" to run migrations on startup (only for web pods)
+RUN_MIGRATIONS="${PERHAPS_RUN_MIGRATIONS:-true}"
+
+# Leader election configuration
+# In Kubernetes, use a leader election mechanism or set this on only one pod
+IS_LEADER="${PERHAPS_IS_LEADER:-true}"
+
+log() {
+  echo "[docker-entrypoint] $(date '+%Y-%m-%d %H:%M:%S') $1"
+}
+
+run_migrations() {
+  if [[ "$RUN_MIGRATIONS" == "true" ]] && [[ "$IS_LEADER" == "true" ]]; then
+    log "Running database migrations..."
+    ./bin/rails db:prepare
+    log "Database migrations complete"
+  else
+    log "Skipping migrations (RUN_MIGRATIONS=$RUN_MIGRATIONS, IS_LEADER=$IS_LEADER)"
+  fi
+}
+
+wait_for_postgres() {
+  log "Waiting for PostgreSQL to be ready..."
+  local max_attempts=30
+  local attempt=1
+
+  while [ $attempt -le $max_attempts ]; do
+    if ./bin/rails db:version > /dev/null 2>&1; then
+      log "PostgreSQL is ready"
+      return 0
+    fi
+    log "PostgreSQL not ready, attempt $attempt/$max_attempts..."
+    sleep 2
+    attempt=$((attempt + 1))
+  done
+
+  log "ERROR: PostgreSQL did not become ready in time"
+  exit 1
+}
+
+wait_for_redis() {
+  log "Waiting for Redis to be ready..."
+  local max_attempts=30
+  local attempt=1
+  local redis_url="${REDIS_URL:-redis://localhost:6379/1}"
+
+  while [ $attempt -le $max_attempts ]; do
+    if bundle exec ruby -e "require 'redis'; Redis.new(url: '$redis_url').ping" 2>/dev/null; then
+      log "Redis is ready"
+      return 0
+    fi
+    log "Redis not ready, attempt $attempt/$max_attempts..."
+    sleep 2
+    attempt=$((attempt + 1))
+  done
+
+  log "ERROR: Redis did not become ready in time"
+  exit 1
+}
+
+start_web() {
+  log "Starting Rails web server..."
+  exec ./bin/rails server -b 0.0.0.0 -p "${PORT:-3000}"
+}
+
+start_worker() {
+  log "Starting Sidekiq worker..."
+  exec bundle exec sidekiq -C config/sidekiq.yml
+}
+
+start_all() {
+  log "Starting both web server and Sidekiq worker..."
+  # Start Sidekiq in the background
+  bundle exec sidekiq -C config/sidekiq.yml &
+  SIDEKIQ_PID=$!
+
+  # Trap signals to properly shut down both processes
+  trap "kill $SIDEKIQ_PID 2>/dev/null; exit 0" SIGTERM SIGINT
+
+  # Start Rails in the foreground
+  ./bin/rails server -b 0.0.0.0 -p "${PORT:-3000}" &
+  RAILS_PID=$!
+
+  # Wait for either process to exit
+  wait $RAILS_PID $SIDEKIQ_PID
+}
+
+main() {
+  log "Starting Perhaps in '$RUNTIME_MODE' mode"
+  log "Environment: RAILS_ENV=${RAILS_ENV:-development}"
+
+  # Handle direct command execution (non-mode commands)
+  # Only pass through commands if NOT in worker-only mode (to prevent CMD override issues)
+  if [ "$#" -gt 0 ] && [ "$RUNTIME_MODE" != "worker" ]; then
+    # If the first argument is a command (not a mode flag), execute it directly
+    case "$1" in
+      ./bin/rails|bin/rails|rails|bundle|rake|ruby|sh|bash)
+        log "Executing command: $*"
+        exec "$@"
+        ;;
+    esac
+  fi
+
+  # Wait for dependencies
+  wait_for_postgres
+  wait_for_redis
+
+  # Run migrations (only for web/all modes and only if leader)
+  case "$RUNTIME_MODE" in
+    web|all)
+      run_migrations
+      ;;
+    worker)
+      log "Skipping migrations (worker mode)"
+      ;;
+    *)
+      log "WARNING: Unknown runtime mode '$RUNTIME_MODE', defaulting to 'web'"
+      RUNTIME_MODE="web"
+      run_migrations
+      ;;
+  esac
+
+  # Start the appropriate process(es)
+  case "$RUNTIME_MODE" in
+    web)
+      start_web
+      ;;
+    worker)
+      start_worker
+      ;;
+    all)
+      start_all
+      ;;
+  esac
+}
+
+main "$@"
