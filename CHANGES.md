@@ -3,16 +3,22 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-20 (Current)
+- **Fixed tailwindcss-rails rake task loading for CI asset precompilation**
+  - The `tailwindcss-rails` gem has `require: false` in Gemfile for runtime optimization
+  - This caused the gem's rake tasks (including `tailwindcss:build`) to not be loaded
+  - As a result, `assets:precompile` was not building Tailwind CSS before running tests
+  - Created `lib/tasks/tailwindcss.rake` to explicitly require the gem and load its rake tasks
+  - This hooks `tailwindcss:build` into `assets:precompile`, ensuring CSS is built for tests
 - **Fixed CI test failures by removing LookbooksController and adding asset precompilation step**
   - Removed unnecessary LookbooksController that was causing Zeitwerk eager loader errors in test environment
     - LookbooksController was causing NameError because Lookbook gem is only in development group
     - Lookbook provides its own default preview controller, so custom controller is unnecessary
     - Deleted app/controllers/lookbooks_controller.rb and removed preview_controller configuration from application.rb
-  - Configured test environment to compile assets on-the-fly instead of requiring precompilation
-    - Tests were failing with "asset 'tailwind.css' was not found" errors
-    - Added `config.assets.compile = true` to test environment configuration
-    - Rails now compiles CSS/JS assets during test execution automatically
-    - Removed unnecessary asset precompilation step from CI workflow
+  - Fixed asset loading in test environment by precompiling and enabling fallback compilation
+    - Tests were failing with "asset 'tailwind.css' was not found" errors in CI
+    - Added `RAILS_ENV=test bin/rails assets:precompile` to CI workflow before running tests
+    - Added `config.assets.compile = true` to test environment as fallback for asset compilation
+    - Ensures tailwind.css and other assets are available during test execution
   - All 1084 tests now pass cleanly without errors
 - **Completed kubernetes-separation feature: Added Helm PDB, HPA, and anti-affinity configuration (Task 06)**
   - Created PodDisruptionBudget templates for web and worker deployments to ensure minimum availability during cluster maintenance
