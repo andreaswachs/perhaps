@@ -2,6 +2,36 @@ require_relative "boot"
 
 require "rails/all"
 
+# Monkey patch to fix connection_pool 3.0 compatibility with Rails 7.2.3
+# Must be loaded before cache store initialization which happens during Rails bootstrap.
+# connection_pool 3.0 changed its API to require keyword arguments instead of a hash,
+# but Rails 7.2.3's RedisCacheStore still passes a hash.
+# This can be removed when upgrading to Rails 8.x which has the fix.
+# See: https://github.com/rails/rails/pull/51613
+require "connection_pool"
+if Gem::Version.new(ConnectionPool::VERSION) >= Gem::Version.new("3.0")
+  module RedisCacheStoreConnectionPoolPatch
+    def initialize(error_handler: ActiveSupport::Cache::RedisCacheStore::DEFAULT_ERROR_HANDLER, **redis_options)
+      universal_options = redis_options.extract!(*ActiveSupport::Cache::UNIVERSAL_OPTIONS)
+
+      if pool_options = self.class.send(:retrieve_pool_options, redis_options)
+        # Fix for connection_pool 3.0: use keyword arguments instead of hash
+        @redis = ::ConnectionPool.new(**pool_options) { self.class.build_redis(**redis_options) }
+      else
+        @redis = self.class.build_redis(**redis_options)
+      end
+
+      @max_key_bytesize = ActiveSupport::Cache::RedisCacheStore::MAX_KEY_BYTESIZE
+      @error_handler = error_handler
+
+      # Call Store#initialize, skipping RedisCacheStore's initialize
+      ActiveSupport::Cache::Store.instance_method(:initialize).bind(self).call(universal_options)
+    end
+  end
+
+  ActiveSupport::Cache::RedisCacheStore.prepend(RedisCacheStoreConnectionPoolPatch)
+end
+
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)

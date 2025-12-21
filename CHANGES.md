@@ -2,7 +2,12 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
-## 2025-12-20 (Current)
+## 2025-12-21 (Current)
+- **Fixed Docker image runtime errors for Kubernetes deployments**
+  - Fixed LoadError for tailwindcss/ruby by keeping tailwindcss-ruby gem in production image (removed the Dockerfile line that deleted it after asset precompilation; the gem is required at runtime by tailwindcss-rails, not just during build)
+  - Fixed Redis cache store ArgumentError with connection_pool 3.x by adding a monkey patch in config/application.rb (sidekiq 8.1.0 requires connection_pool 3.x which changed its API to use keyword arguments; Rails 7.2.3's RedisCacheStore still passes a hash; this patch can be removed when upgrading to Rails 8.x)
+
+## 2025-12-20
 - **Fixed tailwindcss-rails rake task loading for CI asset precompilation**
   - The `tailwindcss-rails` gem has `require: false` in Gemfile for runtime optimization
   - This caused the gem's rake tasks (including `tailwindcss:build`) to not be loaded
