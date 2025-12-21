@@ -4,6 +4,11 @@ class Rack::Attack
   # Enable Rack::Attack
   enabled = Rails.env.production? || Rails.env.staging?
 
+  # Use Rails cache store for rate limiting
+  # This ensures rate limits are shared across multiple app instances when using Redis
+  # Rack::Attack uses Rails.cache by default, so no explicit configuration needed
+  # The cache store is configured in config/environments/production.rb
+
   # Throttle requests to the OAuth token endpoint
   throttle("oauth/token", limit: 10, period: 1.minute) do |request|
     request.ip if request.path == "/oauth/token"

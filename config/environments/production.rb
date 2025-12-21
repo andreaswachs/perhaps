@@ -69,8 +69,18 @@ Rails.application.configure do
   # want to log everything, set the level to "debug".
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "info")
 
-  if ENV["CACHE_REDIS_URL"].present?
-    config.cache_store = :redis_cache_store, { url: ENV["CACHE_REDIS_URL"] }
+  # Cache store configuration for stateless deployments
+  # Requires Redis for multi-instance deployments (rate limiting, OAuth flows, etc.)
+  cache_redis_url = ENV["CACHE_REDIS_URL"].presence || ENV["REDIS_URL"].presence
+  if cache_redis_url.present?
+    # Use a separate Redis database for cache if using the same Redis URL as Sidekiq
+    # Append /2 to use database 2 for caching (Sidekiq uses /1 by default)
+    cache_url = cache_redis_url.include?("/") ? cache_redis_url : "#{cache_redis_url}/2"
+    config.cache_store = :redis_cache_store, { url: cache_url }
+  else
+    # Fallback to memory store - will not work correctly with multiple instances
+    # Log warning at boot time (see config/initializers/runtime_mode.rb)
+    config.cache_store = :memory_store
   end
 
   config.action_mailer.perform_caching = false
