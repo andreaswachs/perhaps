@@ -3,6 +3,11 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-21 (Current)
+- **Improved statelessness for multi-instance deployments (Kubernetes support)**
+  - Cache store now falls back to `REDIS_URL` when `CACHE_REDIS_URL` is not set (uses Redis DB 2 by default)
+  - Added startup warnings in production when using memory-based cache (rate limiting, OAuth flows won't work across instances)
+  - Added startup warnings when Active Storage uses local disk storage (file uploads won't be shared across instances)
+  - Rack::Attack rate limiting now properly works across instances when Redis cache is configured
 - **Fixed flaky API rate limit test** - Added `travel_to` time freeze to prevent test failures when running across hour boundaries (rate limiter uses hourly windows)
 - **Fixed Docker image runtime errors for Kubernetes deployments**
   - Fixed LoadError for tailwindcss/ruby by keeping tailwindcss-ruby gem in production image (removed the Dockerfile line that deleted it after asset precompilation; the gem is required at runtime by tailwindcss-rails, not just during build)
