@@ -3,6 +3,10 @@
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
 ## 2025-12-25
+- **Fixed "rails not found in PATH" error for Kubernetes migration jobs**
+  - Added `/rails/bin` to PATH in Dockerfile so Rails binstubs are globally accessible
+  - Root cause: K8s migration jobs running `rails db:migrate` couldn't find the command because only relative paths (`./bin/rails`) worked previously
+  - Now `rails`, `rake`, `bundle` and other binstubs work from any directory in the container
 - **Replaced Maybe Finance logos with new Perhaps branding**
   - Created stylized "P" logomark using rounded bars (pills) design language
   - New color scheme: teal (#14B8A6) to blue (#3B82F6) to indigo (#6366F1) to purple (#8B5CF6)
