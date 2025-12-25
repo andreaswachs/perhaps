@@ -1,7 +1,7 @@
 # syntax = docker/dockerfile:1
 
 # Development Dockerfile for hot reloading with mounted source code
-ARG RUBY_VERSION=3.4.4
+ARG RUBY_VERSION=3.4.7
 FROM registry.docker.com/library/ruby:$RUBY_VERSION-slim
 
 # Rails app lives here

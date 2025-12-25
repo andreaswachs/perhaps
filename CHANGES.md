@@ -2,7 +2,14 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
-## 2025-12-21 (Current)
+## 2025-12-25
+- **Replaced Maybe Finance logos with new Perhaps branding**
+  - Created stylized "P" logomark using rounded bars (pills) design language
+  - New color scheme: teal (#14B8A6) to blue (#3B82F6) to indigo (#6366F1) to purple (#8B5CF6)
+  - Updated logomark.svg, logomark-color.svg, logo.svg (wordmark), logo-squircle.svg, and safari-pinned-tab.svg
+  - PNG files (logo-color.png, logo-pwa.png) regenerated from updated SVGs using ImageMagick
+
+## 2025-12-21
 - **Improved statelessness for multi-instance deployments (Kubernetes support)**
   - Cache store now falls back to `REDIS_URL` when `CACHE_REDIS_URL` is not set (uses Redis DB 2 by default)
   - Added startup warnings in production when using memory-based cache (rate limiting, OAuth flows won't work across instances)
