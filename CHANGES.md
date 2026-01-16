@@ -2,6 +2,9 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
+## 2026-01-16
+- **Removed AI integrations (Anthropic and OpenAI)** - Removed all AI-powered features including chat assistant, auto-categorization of transactions, auto-detection of merchants, and related models/controllers/views/jobs. Removed `anthropic` and `mcp` gems from dependencies. Created migration to drop chats, messages, and tool_calls tables, as well as AI-related columns from users table.
+
 ## 2025-12-25
 - **Replaced Maybe Finance logos with new Perhaps branding**
   - Created stylized "P" logomark using rounded bars (pills) design language

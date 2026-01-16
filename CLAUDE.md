@@ -18,7 +18,7 @@ in the root folder of the repository.
 **IMPORTANT:** When implementing significant new features or architectural changes, update this CLAUDE.md file to document them. This ensures future development sessions have accurate context about the codebase.
 
 Examples of changes that should be documented here:
-- New integrations or providers (e.g., GoCardless, Anthropic)
+- New integrations or providers (e.g., GoCardless)
 - New major models or domain concepts
 - Changes to the development workflow or tooling
 - Architectural decisions or pattern changes
@@ -199,21 +199,7 @@ Three primary data ingestion methods:
 Sidekiq handles asynchronous tasks:
 - Account syncing (`SyncAccountsJob`)
 - Import processing (`ImportDataJob`)
-- AI chat responses (`CreateChatResponseJob`)
 - Scheduled maintenance via sidekiq-cron
-
-### AI Provider (Anthropic Claude)
-The app uses Anthropic Claude for all AI-powered features:
-- **Provider**: `Provider::Anthropic` (replaced OpenAI)
-- **Models available**:
-  - `claude-haiku-4-5-20250929` ("Fast" mode) - Quick responses, lower cost
-  - `claude-sonnet-4-5-20250929` ("Intelligent" mode) - Best quality, complex reasoning
-- **Features powered by AI**:
-  - Chat assistant for financial questions
-  - Auto-categorization of transactions
-  - Auto-detection of merchants
-- **Configuration**: Requires `ANTHROPIC_API_KEY` env var (or `Setting.anthropic_api_key`)
-- **Model selection**: Users can toggle between Fast/Intelligent modes in the chat interface
 
 ### Frontend Architecture
 - **Hotwire Stack**: Turbo + Stimulus for reactive UI without heavy JavaScript

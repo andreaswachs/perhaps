@@ -90,8 +90,6 @@ GEM
     after_commit_everywhere (1.6.0)
       activerecord (>= 4.2)
       activesupport
-    anthropic (1.16.2)
-      connection_pool
     ast (2.4.3)
     aws-eventstream (1.4.0)
     aws-partitions (1.1198.0)
@@ -284,10 +282,6 @@ GEM
       activesupport (>= 7.0.0)
     jmespath (1.6.2)
     json (2.18.0)
-    json-schema (6.0.0)
-      addressable (~> 2.8)
-      bigdecimal (~> 3.1)
-    json_rpc_handler (0.1.1)
     jwt (2.10.2)
       base64
     language_server-protocol (3.17.0.5)
@@ -336,9 +330,6 @@ GEM
       net-smtp
     marcel (1.1.0)
     matrix (0.4.3)
-    mcp (0.4.0)
-      json-schema (>= 4.1)
-      json_rpc_handler (~> 0.1)
     memory_profiler (1.1.0)
     mini_histogram (0.3.1)
     mini_magick (5.3.1)
@@ -644,7 +635,6 @@ DEPENDENCIES
   activerecord-import
   activestorage (>= 7.2.2)
   after_commit_everywhere (~> 1.0)
-  anthropic
   aws-sdk-s3 (~> 1.177.0)
   bcrypt (~> 3.1)
   benchmark-ips
@@ -677,7 +667,6 @@ DEPENDENCIES
   logtail-rails
   lookbook (= 2.3.11)
   lucide-rails!
-  mcp
   minitest (~> 5.25.5)
   mocha
   nokogiri (>= 1.18.9)
@@ -725,7 +714,7 @@ DEPENDENCIES
   webrick (~> 1.8)
 
 RUBY VERSION
-   ruby 3.4.7p58
+   ruby 3.3.6p58
 
 BUNDLED WITH
    2.6.9

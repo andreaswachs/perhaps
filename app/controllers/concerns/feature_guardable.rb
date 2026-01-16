@@ -3,8 +3,8 @@
 #
 # Example:
 #
-# class MessagesController < ApplicationController
-#   guard_feature unless: -> { Current.user.ai_enabled? }
+# class SomeController < ApplicationController
+#   guard_feature unless: -> { Current.user.feature_enabled? }
 # end
 #
 module FeatureGuardable

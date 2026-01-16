@@ -74,10 +74,6 @@ gem "rubyzip", "~> 2.3"
 gem "aasm"
 gem "after_commit_everywhere", "~> 1.0"
 
-# AI
-gem "anthropic"
-gem "mcp"
-
 group :development, :test do
   gem "debug", platforms: %i[mri windows]
   gem "brakeman", require: false
