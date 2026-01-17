@@ -1,3 +1,4 @@
+---
 # ===========================================================================
 # Development Docker Compose file
 # ===========================================================================
@@ -36,7 +37,7 @@ x-db-env: &db_env
   POSTGRES_DB: ${POSTGRES_DB:-perhaps_development}
 
 x-rails-dev-env: &rails_dev_env
-  <<: *db_env
+  !!merge <<: *db_env
   RAILS_ENV: development
   DB_HOST: db
   DB_PORT: 5432
@@ -45,8 +46,6 @@ x-rails-dev-env: &rails_dev_env
   BINDING: 0.0.0.0
   GOCARDLESS_SECRET_ID: "${GOCARDLESS_SECRET_ID}"
   GOCARDLESS_SECRET_KEY: "${GOCARDLESS_SECRET_KEY}"
-  ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY}"
-  PERHAPS_AI_ENABLED: "true"
   SELF_HOSTED: "true"
 
 services:
@@ -62,7 +61,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-perhaps_development}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -75,7 +74,7 @@ services:
     volumes:
       - redis-dev-data:/data
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -99,9 +98,9 @@ services:
       - storage-dev:/rails/storage
     ports:
       - "3000:3000"
-      - "3035:3035"  # Webpack dev server if needed
+      - "3035:3035" # Webpack dev server if needed
     environment:
-      <<: *rails_dev_env
+      !!merge <<: *rails_dev_env
     depends_on:
       db:
         condition: service_healthy
@@ -126,7 +125,7 @@ services:
       - tmp-dev:/rails/tmp
       - storage-dev:/rails/storage
     environment:
-      <<: *rails_dev_env
+      !!merge <<: *rails_dev_env
     depends_on:
       db:
         condition: service_healthy

@@ -17,19 +17,11 @@ class UsersController < ApplicationController
         redirect_to settings_profile_path, alert: error_message
       end
     else
-      was_ai_enabled = @user.ai_enabled
       @user.update!(user_params.except(:redirect_to, :delete_profile_image))
       @user.profile_image.purge if should_purge_profile_image?
 
-      # Add a special notice if AI was just enabled
-      notice = if !was_ai_enabled && @user.ai_enabled
-        "AI Assistant has been enabled successfully."
-      else
-        t(".success")
-      end
-
       respond_to do |format|
-        format.html { handle_redirect(notice) }
+        format.html { handle_redirect(t(".success")) }
         format.json { head :ok }
       end
     end
@@ -88,7 +80,7 @@ class UsersController < ApplicationController
     def user_params
       params.require(:user).permit(
         :first_name, :last_name, :email, :profile_image, :redirect_to, :delete_profile_image, :onboarded_at,
-        :show_sidebar, :default_period, :show_ai_sidebar, :ai_enabled, :theme, :set_onboarding_preferences_at, :set_onboarding_goals_at,
+        :show_sidebar, :default_period, :theme, :set_onboarding_preferences_at, :set_onboarding_goals_at,
         family_attributes: [ :name, :currency, :country, :locale, :date_format, :timezone, :id ],
         goals: []
       )

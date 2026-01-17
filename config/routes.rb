@@ -35,15 +35,6 @@ Rails.application.routes.draw do
   # Uses basic auth - see config/initializers/sidekiq.rb
   mount Sidekiq::Web => "/sidekiq"
 
-  # AI chats
-  resources :chats do
-    resources :messages, only: :create
-
-    member do
-      post :retry
-    end
-  end
-
   resources :family_exports, only: %i[new create index] do
     member do
       get :download
@@ -232,12 +223,6 @@ Rails.application.routes.draw do
       resources :accounts, only: [ :index ]
       resources :transactions, only: [ :index, :show, :create, :update, :destroy ]
       resource :usage, only: [ :show ], controller: "usage"
-
-      resources :chats, only: [ :index, :show, :create, :update, :destroy ] do
-        resources :messages, only: [ :create ] do
-          post :retry, on: :collection
-        end
-      end
 
       # MCP (Model Context Protocol) endpoint
       post "mcp", to: "mcp#handle"

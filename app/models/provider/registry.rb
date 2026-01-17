@@ -3,7 +3,7 @@ class Provider::Registry
 
   Error = Class.new(StandardError)
 
-  CONCEPTS = %i[exchange_rates securities llm]
+  CONCEPTS = %i[exchange_rates securities]
 
   validates :concept, inclusion: { in: CONCEPTS }
 
@@ -72,14 +72,6 @@ class Provider::Registry
       def github
         Provider::Github.new
       end
-
-      def anthropic
-        api_key = ENV.fetch("ANTHROPIC_API_KEY", Setting.anthropic_api_key)
-
-        return nil unless api_key.present?
-
-        Provider::Anthropic.new(api_key)
-      end
   end
 
   def initialize(concept)
@@ -108,10 +100,8 @@ class Provider::Registry
         %i[synth]
       when :securities
         %i[synth]
-      when :llm
-        %i[anthropic]
       else
-        %i[synth plaid_us plaid_eu github anthropic]
+        %i[synth plaid_us plaid_eu github]
       end
     end
 end

@@ -199,21 +199,14 @@ Three primary data ingestion methods:
 Sidekiq handles asynchronous tasks:
 - Account syncing (`SyncAccountsJob`)
 - Import processing (`ImportDataJob`)
-- AI chat responses (`CreateChatResponseJob`)
 - Scheduled maintenance via sidekiq-cron
 
-### AI Provider (Anthropic Claude)
-The app uses Anthropic Claude for all AI-powered features:
-- **Provider**: `Provider::Anthropic` (replaced OpenAI)
-- **Models available**:
-  - `claude-haiku-4-5-20250929` ("Fast" mode) - Quick responses, lower cost
-  - `claude-sonnet-4-5-20250929` ("Intelligent" mode) - Best quality, complex reasoning
-- **Features powered by AI**:
-  - Chat assistant for financial questions
-  - Auto-categorization of transactions
-  - Auto-detection of merchants
-- **Configuration**: Requires `ANTHROPIC_API_KEY` env var (or `Setting.anthropic_api_key`)
-- **Model selection**: Users can toggle between Fast/Intelligent modes in the chat interface
+### MCP Server (Model Context Protocol)
+The app exposes data via MCP for external AI agents:
+- **Endpoint**: `POST /api/v1/mcp`
+- **Authentication**: OAuth2 with OIDC or API keys
+- **Tools available**: Account listing, transaction queries, financial summaries
+- **Documentation**: See `docs/MCP_SERVER.md`
 
 ### Frontend Architecture
 - **Hotwire Stack**: Turbo + Stimulus for reactive UI without heavy JavaScript

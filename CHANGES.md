@@ -2,6 +2,15 @@
 
 This file documents modifications made to this fork of the original Maybe Finance project, as required by AGPLv3 Section 5(a).
 
+## 2026-01-17
+- **Removed built-in AI chat integrations to support MCP-only AI access**
+  - Removed Anthropic and OpenAI provider integrations (chat, auto-categorization, auto-merchant detection)
+  - Removed AI chat UI, controllers, models (Chat, Message, Assistant, etc.), and related background jobs
+  - Removed ai_enabled and show_ai_sidebar user columns via migration
+  - Kept MCP server functionality for external AI agent access via OAuth2/API keys
+  - Updated Provider::Registry to remove LLM concept and Anthropic provider
+  - Updated documentation and configuration files
+
 ## 2025-12-25
 - **Fixed "rails not found in PATH" error for Kubernetes migration jobs**
   - Added `/rails/bin` to PATH in Dockerfile so Rails binstubs are globally accessible
