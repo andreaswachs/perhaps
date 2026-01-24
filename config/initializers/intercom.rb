@@ -56,8 +56,7 @@ if ENV["INTERCOM_APP_ID"].present? && ENV["INTERCOM_IDENTITY_VERIFICATION_KEY"].
       family_id: Proc.new { Current.family.id },
       name: Proc.new { Current.user.display_name if Current.user.display_name != Current.user.email },
       "Role": Proc.new { Current.user.role },
-      "Connections": Proc.new { Current.family.accounts.count },
-      "AI Enabled": Proc.new { Current.user.ai_enabled }
+      "Connections": Proc.new { Current.family.accounts.count }
     }
 
     # == Current company method/variable

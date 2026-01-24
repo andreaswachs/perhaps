@@ -1,3 +1,4 @@
+---
 empty:
   family: empty
   first_name: User
@@ -6,7 +7,6 @@ empty:
   password_digest: "$2a$12$3PahBIlFgOeEDRlkfSPc6OpLRLDWG9QZIXSxuImeetWOhCRmVote2"
   onboarded_at: <%= 3.days.ago %>
   role: admin
-  ai_enabled: true
 
 perhaps_support_staff:
   family: empty
@@ -16,7 +16,6 @@ perhaps_support_staff:
   password_digest: "$2a$12$3PahBIlFgOeEDRlkfSPc6OpLRLDWG9QZIXSxuImeetWOhCRmVote2"
   role: super_admin
   onboarded_at: <%= 3.days.ago %>
-  ai_enabled: true
 
 family_admin:
   family: dylan_family
@@ -26,7 +25,6 @@ family_admin:
   password_digest: "$2a$12$3PahBIlFgOeEDRlkfSPc6OpLRLDWG9QZIXSxuImeetWOhCRmVote2"
   role: admin
   onboarded_at: <%= 3.days.ago %>
-  ai_enabled: true
 
 family_member:
   family: dylan_family
@@ -35,7 +33,6 @@ family_member:
   email: jakobdylan@yahoo.com
   password_digest: "$2a$12$3PahBIlFgOeEDRlkfSPc6OpLRLDWG9QZIXSxuImeetWOhCRmVote2"
   onboarded_at: <%= 3.days.ago %>
-  ai_enabled: true
 
 new_email:
   family: empty
@@ -45,4 +42,3 @@ new_email:
   unconfirmed_email: new@example.com
   password_digest: "$2a$12$3PahBIlFgOeEDRlkfSPc6OpLRLDWG9QZIXSxuImeetWOhCRmVote2"
   onboarded_at: <%= Time.current %>
-  ai_enabled: true

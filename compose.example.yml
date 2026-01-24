@@ -1,3 +1,4 @@
+---
 # ===========================================================================
 # Example Docker Compose file
 # ===========================================================================
@@ -33,7 +34,7 @@ x-db-env: &db_env
   POSTGRES_DB: ${POSTGRES_DB:-perhaps_production}
 
 x-rails-env: &rails_env
-  <<: *db_env
+  !!merge <<: *db_env
   SECRET_KEY_BASE: ${SECRET_KEY_BASE:-a7523c3d0ae56415046ad8abae168d71074a79534a7062258f8d1d51ac2f76d3c3bc86d86b6b0b307df30d9a6a90a2066a3fa9e67c5e6f374dbd7dd4e0778e13}
   SELF_HOSTED: "true"
   RAILS_FORCE_SSL: "false"
@@ -41,8 +42,6 @@ x-rails-env: &rails_env
   DB_HOST: db
   DB_PORT: 5432
   REDIS_URL: redis://redis:6379/1
-# NOTE: enabling Anthropic Claude will incur costs when you use AI-related features in the app (chat, rules). Make sure you have set appropriate spend limits on your account before adding this.
-  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
 
 services:
   web:
@@ -59,7 +58,7 @@ services:
       - 3000:3000
     restart: unless-stopped
     environment:
-      <<: *rails_env
+      !!merge <<: *rails_env
       PERHAPS_RUNTIME_MODE: web
       PERHAPS_RUN_MIGRATIONS: "true"
       PERHAPS_IS_LEADER: "true"
@@ -87,7 +86,7 @@ services:
       redis:
         condition: service_healthy
     environment:
-      <<: *rails_env
+      !!merge <<: *rails_env
       PERHAPS_RUNTIME_MODE: worker
     networks:
       - perhaps_net
@@ -98,9 +97,9 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
     environment:
-      <<: *db_env
+      !!merge <<: *db_env
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB" ]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -113,7 +112,7 @@ services:
     volumes:
       - redis-data:/data
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 5s
       timeout: 5s
       retries: 5

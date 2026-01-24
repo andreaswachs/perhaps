@@ -74,8 +74,7 @@ gem "rubyzip", "~> 2.3"
 gem "aasm"
 gem "after_commit_everywhere", "~> 1.0"
 
-# AI
-gem "anthropic"
+# MCP (Model Context Protocol) - for external AI agent access
 gem "mcp"
 
 group :development, :test do
